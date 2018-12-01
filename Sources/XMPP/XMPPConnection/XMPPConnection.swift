@@ -10,10 +10,10 @@ import Foundation
 import Network
 import os.log
 
-class XMPPConnection: NSObject {
+public class XMPPConnection: NSObject {
     static internal let osLog = OSLog(subsystem: "computer.johnson.libxmpp.XMPPConnection", category: "network")
 
-    let domain: String
+    public let domain: String
 
     // MARK: Shared variables
     internal var connectionAddresses: [(host: String, port: UInt16)]!
@@ -21,11 +21,11 @@ class XMPPConnection: NSObject {
 
     internal var session: XMPPSession!
 
-    private var connectionObservers: [XMPPConnectionObserver] = []
+    public weak var connectionDelegate: XMPPConnectionDelegate!
 
     // MARK: Initialization and deinitialization
 
-    init(forDomain domain: String, allowInsecure: Bool) {
+    public init(forDomain domain: String, allowInsecure: Bool) {
         self.domain = domain
         self.allowInsecure = allowInsecure
     }
@@ -43,25 +43,12 @@ class XMPPConnection: NSObject {
         self.resolveSRV()
     }
 
-    public func addConnectionObserver(observer: XMPPConnectionObserver) -> Int {
-        self.connectionObservers.append(observer)
-        return self.connectionObservers.count - 1
-    }
-
-    public func removeConnectionObserver(observer: Int) {
-        self.connectionObservers.remove(at: observer)
-    }
-
     internal func dispatchConnected(status: XMPPConnectionStatus) {
-        for connectionObserver in self.connectionObservers {
-            connectionObserver.xmppConnected(connectionStatus: status)
-        }
+        self.connectionDelegate?.xmppConnected(connectionStatus: status)
     }
 
     internal func dispatchCannotConnect(error: Error) {
-        for connectionObserver in self.connectionObservers {
-            connectionObserver.xmppCannotConnect(error: error)
-        }
+        self.connectionDelegate?.xmppCannotConnect(error: error)
     }
 
     internal func fatalConnectionError(_ error: Error) {
@@ -74,14 +61,14 @@ protocol XMPPStanzaObserver {
     func stanzaReceived(element: Element)
 }
 
-struct XMPPConnectionStatus {
+public struct XMPPConnectionStatus {
     var serviceAvailable: Bool
     var secure: Bool
     var canLogin: Bool
     var canRegister: Bool
 }
 
-protocol XMPPConnectionObserver {
+public protocol XMPPConnectionDelegate: class {
     func xmppCannotConnect(error: Error)
     func xmppConnected(connectionStatus: XMPPConnectionStatus)
 }

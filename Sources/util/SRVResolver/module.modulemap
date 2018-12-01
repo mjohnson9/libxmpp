@@ -1,0 +1,4 @@
+module SRVResolver {
+    header "SRVResolver.h"
+    export *
+}

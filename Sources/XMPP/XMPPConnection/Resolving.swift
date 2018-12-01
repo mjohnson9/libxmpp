@@ -9,6 +9,8 @@
 import Foundation
 import os.log
 
+import SRVResolver
+
 private struct AssociatedKeys {
     static var resolver: UInt8 = 0
     static var resolverTimer: UInt8 = 0

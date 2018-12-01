@@ -9,6 +9,8 @@
 import Foundation
 import os.log
 
+import SRVResolver
+
 class SRVRecord: NSObject {
     var target: String
     var port: UInt16

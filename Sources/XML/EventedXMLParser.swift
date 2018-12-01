@@ -52,21 +52,21 @@ class XMLParsingError: Error {
     }
 }
 
-protocol EventedXMLParserDelegate: class {
-    func parserDidStartDocument()
-    func parserDidEndDocument()
+@objc protocol EventedXMLParserDelegate: class {
+    @objc optional func parserDidStartDocument()
+    @objc optional func parserDidEndDocument()
 
-    func elementStarted(tag: String, namespaceURI: String?, prefix: String?, namespaces: [String: String], attributes: [String: String])
-    func elementEnded(tag: String, namespaceURI: String?, prefix: String?)
+    @objc optional func elementStarted(tag: String, namespaceURI: String?, prefix: String?, namespaces: [String: String], attributes: [String: String])
+    @objc optional func elementEnded(tag: String, namespaceURI: String?, prefix: String?)
 
-    func resolveExternalEntityName(name: String, systemID: String?) -> Data?
+    @objc optional func resolveExternalEntityName(name: String, systemID: String?) -> Data?
 
-    func parseErrorOccured(error: Error)
+    @objc optional func parseErrorOccured(error: Error)
 
-    func foundCharacters(characters: String)
-    func foundIgnorableWhitespace(whitespace: String)
+    @objc optional func foundCharacters(characters: String)
+    @objc optional func foundIgnorableWhitespace(whitespace: String)
 
-    func foundProcessingInstruction(target: String, data: String?)
-    func foundComment(comment: String)
-    func foundCDATA(data: Data)
+    @objc optional func foundProcessingInstruction(target: String, data: String?)
+    @objc optional func foundComment(comment: String)
+    @objc optional func foundCDATA(data: Data)
 }

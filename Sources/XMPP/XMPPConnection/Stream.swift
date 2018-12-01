@@ -147,20 +147,20 @@ extension XMPPConnection: StreamDelegate {
             let connectionAddress = self.connectionAddresses[self.currentConnectionAddress]
             self.currentConnectionAddress += 1
 
-            let error = self.attemptConnection(toHostname: connectionAddress.host, toPort: connectionAddress.port)
+            self.attemptConnection(toHostname: connectionAddress.host, toPort: connectionAddress.port)
 
             // Send some debug information
-            if let nsError = error as NSError? {
+            /*if let nsError = error as NSError? {
                 print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port) with error: (\(nsError.domain):\(nsError.code)) \(nsError.localizedDescription) | \(nsError.localizedFailureReason ?? "(no localized failure reason)")")
             } else if error != nil {
                 print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port) with error: (\(String(describing: error))")
             } else {
                 print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port)")
-            }
+            }*/
         }
     }
 
-    private func attemptConnection(toHostname hostname: String, toPort port: UInt16) -> Error? {
+    private func attemptConnection(toHostname hostname: String, toPort port: UInt16) {
         print("\(self.domain): Attempting connection to \(hostname):\(port)")
 
         self.session = XMPPSession()

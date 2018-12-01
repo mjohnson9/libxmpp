@@ -8,7 +8,7 @@
 
 import Foundation
 
-class XMPPErrorStanza: Error {
+public class XMPPErrorStanza: Error {
     var stanza: Element
 
     init(stanza: Element) {
@@ -16,20 +16,20 @@ class XMPPErrorStanza: Error {
     }
 }
 
-class XMPPNoSuchDomainError: Error {
+public class XMPPNoSuchDomainError: Error {
 }
 
-class XMPPServiceNotSupportedError: Error {
+public class XMPPServiceNotSupportedError: Error {
 }
 
-class XMPPUnableToConnectError: Error {
+public class XMPPUnableToConnectError: Error {
 }
 
-class XMPPCriticalSSLError: Error {
+public class XMPPCriticalSSLError: Error {
 }
 
-class XMPPIncompatibleError: Error {
+public class XMPPIncompatibleError: Error {
 }
 
-class XMPPXMLError: Error {
+public class XMPPXMLError: Error {
 }
