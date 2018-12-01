@@ -53,7 +53,7 @@
 		4C3ED55121B2DE93007CB7AD = {
 			isa = PBXGroup;
 			children = (
-				4C3ED55D21B2DE93007CB7AD /* libxmpp */,
+				4C3ED55D21B2DE93007CB7AD /* Sources */,
 				4C3ED56821B2DE93007CB7AD /* libxmppTests */,
 				4C3ED55C21B2DE93007CB7AD /* Products */,
 			);
@@ -68,13 +68,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		4C3ED55D21B2DE93007CB7AD /* libxmpp */ = {
+		4C3ED55D21B2DE93007CB7AD /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				4C3ED55E21B2DE93007CB7AD /* libxmpp.h */,
 				4C3ED55F21B2DE93007CB7AD /* Info.plist */,
 			);
-			path = libxmpp;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		4C3ED56821B2DE93007CB7AD /* libxmppTests */ = {
