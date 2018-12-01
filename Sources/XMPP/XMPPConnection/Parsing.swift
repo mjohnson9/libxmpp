@@ -39,35 +39,35 @@ extension XMPPConnection: EventedXMLParserDelegate {
 
     /*public func parser(didStartMappingPrefix: String, toURI: String) {
         var namespaceURIs = self.session!.namespacePrefixes[didStartMappingPrefix]
-        if(namespaceURIs == nil) {
+        if namespaceURIs == nil {
             namespaceURIs = []
         }
         namespaceURIs!.append(toURI)
         self.session!.namespacePrefixes[didStartMappingPrefix] = namespaceURIs
-        
-        if(didStartMappingPrefix.count > 0) {
-            if(self.session!.namespacesForElement == nil) {
+
+        if didStartMappingPrefix.count > 0 {
+            if self.session!.namespacesForElement == nil {
                 self.session!.namespacesForElement = [:]
             }
-            
+
             self.session!.namespacesForElement[didStartMappingPrefix] = toURI
         }
     }
-    
+
     public func parser(_: XMLParser, didEndMappingPrefix: String) {
-        if(self.parserNeedsReset) {
-            // The parser calls this delegate during TLS negotiation for some reason
+        guard !self.parserNeedsReset else {
+            os_log(.debug, log: XMPPConnection.osLog, "%s: Stopped mapping prefix \"%{public}s\" while the parser was awaiting reset", self.domain, didEndMappingPrefix)
             return
         }
-        
+
         var namespaceURIs = self.session!.namespacePrefixes[didEndMappingPrefix]
-        if(namespaceURIs == nil) {
+        if namespaceURIs == nil {
             os_log(.info, log: XMPPConnection.osLog, "%s: Ended namespace %{public}s without ever starting it", self.domain, didEndMappingPrefix)
             self.sendStreamErrorAndClose(tag: "invalid-xml")
             return
         }
         namespaceURIs!.remove(at: namespaceURIs!.count - 1)
-        if(namespaceURIs!.count == 0) {
+        if namespaceURIs!.count == 0 {
             self.session!.namespacePrefixes.removeValue(forKey: didEndMappingPrefix)
         } else {
             self.session!.namespacePrefixes[didEndMappingPrefix] = namespaceURIs
