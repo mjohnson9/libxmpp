@@ -33,3 +33,27 @@ public class XMPPIncompatibleError: Error {
 
 public class XMPPXMLError: Error {
 }
+
+public class XMPPMultiError: Error, CustomStringConvertible {
+    public let underlyingErrors: [Error]
+
+    public let description: String
+
+    init(underlyingErrors: [Error]) {
+        self.underlyingErrors = underlyingErrors
+
+        let stringBuilder: NSMutableString = ""
+        var first = true
+        for error in self.underlyingErrors {
+            if !first {
+                stringBuilder.append(", ")
+            } else {
+                first = false
+            }
+
+            stringBuilder.append(String(describing: error))
+        }
+
+        self.description = stringBuilder as String
+    }
+}
