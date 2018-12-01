@@ -10,6 +10,16 @@ import Foundation
 import os.log
 
 extension XMPPConnection {
+    private static let stanzaHandlers: [String: (XMPPConnection) -> (Stanza) -> Void] = [
+        // Stream features
+        "{http://etherx.jabber.org/streams}features": XMPPConnection.processFeatures,
+        // Stream errors
+        "{http://etherx.jabber.org/streams}error": XMPPConnection.receivedStreamError,
+
+        // TLS
+        "{urn:ietf:params:xml:ns:xmpp-tls}proceed": XMPPConnection.processTLSProceed,
+        "{urn:ietf:params:xml:ns:xmpp-tls}failure": XMPPConnection.processTLSFailure
+    ]
     internal func receivedStanza(element: Element) {
         os_log(.debug, log: XMPPConnection.osLog, "%s <- %{private}s", self.domain, element.serialize())
 
@@ -19,15 +29,15 @@ extension XMPPConnection {
             return
         }
 
-        switch stanza.namespace {
-        case "http://etherx.jabber.org/streams":
-            return self.processStreamsNamespace(stanza)
-        case "urn:ietf:params:xml:ns:xmpp-tls":
-            return self.processTlsNamespace(stanza)
-        default:
-            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza from namespace %{public}s", self.domain, stanza.namespace)
-            self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
-            return
+        let keys = [stanza.mapKey(), stanza.mapKeyNamespaceOnly(), stanza.mapKeyTagOnly()]
+        for key in keys {
+            if let handler = XMPPConnection.stanzaHandlers[key] {
+                handler(self)(stanza)
+                return
+            }
         }
+
+        os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza from namespace %{public}s", self.domain, stanza.namespace)
+        self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
     }
 }

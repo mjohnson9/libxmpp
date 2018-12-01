@@ -59,10 +59,11 @@ extension XMPPConnection {
 
             self.session.availableFeatures.append(feature)
 
+            let featureKey = feature.mapKey()
             if feature.required {
-                self.session.requiredFeaturesRemaining[feature.featureKey()] = feature
+                self.session.requiredFeaturesRemaining[featureKey] = feature
             } else {
-                self.session.optionalFeaturesRemaining[feature.featureKey()] = feature
+                self.session.optionalFeaturesRemaining[featureKey] = feature
             }
         }
 
@@ -99,7 +100,7 @@ extension XMPPConnection {
     }
 
     internal func featureNegotiationComplete(_ feature: FeatureStanza) {
-        let key = feature.featureKey()
+        let key = feature.mapKey()
         self.session.requiredFeaturesRemaining.removeValue(forKey: key)
         self.session.optionalFeaturesRemaining.removeValue(forKey: key)
 

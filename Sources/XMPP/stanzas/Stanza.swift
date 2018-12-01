@@ -56,4 +56,25 @@ class Stanza {
         }
         // swiftlint:enable identifier_name
     }
+
+    public func mapKey() -> String {
+        if self.namespace == "" {
+            return self.tag
+        }
+        return "{" + self.namespace + "}" + self.tag
+    }
+
+    public func mapKeyTagOnly() -> String {
+        if self.namespace == "" {
+            return self.tag
+        }
+        return "{*}" + self.tag
+    }
+
+    public func mapKeyNamespaceOnly() -> String {
+        if self.namespace == "" {
+            return self.tag
+        }
+        return "{" + self.namespace + "}*"
+    }
 }

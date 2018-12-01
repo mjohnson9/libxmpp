@@ -22,8 +22,4 @@ class FeatureStanza: Stanza {
 
         super.init(element)
     }
-
-    public func featureKey() -> String {
-        return self.namespace + ":" + self.tag
-    }
 }

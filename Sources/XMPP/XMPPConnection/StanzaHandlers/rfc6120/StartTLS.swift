@@ -10,33 +10,6 @@ import Foundation
 import os.log
 
 extension XMPPConnection {
-    internal func processTlsNamespace(_ stanza: Stanza) {
-        switch stanza.tag {
-        case "proceed":
-            if !self.session!.requestsMade.startTls {
-                os_log(.info, log: XMPPConnection.osLog, "%s: Server sent StartTLS proceed without being asked", self.domain)
-                self.sendStreamErrorAndClose(tag: "invalid-xml")
-                return
-            }
-
-            self.enableTLS()
-            return
-        case "failure":
-            if !self.session!.requestsMade.startTls {
-                os_log(.info, log: XMPPConnection.osLog, "%s: Server sent StartTLS failure without being asked", self.domain)
-                self.sendStreamErrorAndClose(tag: "invalid-xml")
-                return
-            }
-
-            self.disconnectAndRetry()
-            return
-        default:
-            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.namespace)
-            self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
-            return
-        }
-    }
-
     internal func negotiateTLS(_ stanza: Stanza) {
         let element = Element()
         element.tag = "starttls"
@@ -46,14 +19,33 @@ extension XMPPConnection {
         self.write(element)
     }
 
-    internal func enableTLS() {
+    internal func processTLSProceed(_ stanza: Stanza) {
+        guard self.session!.requestsMade.startTls else {
+            os_log(.info, log: XMPPConnection.osLog, "%s: Server sent StartTLS proceed without being asked", self.domain)
+            self.sendStreamErrorAndClose(tag: "invalid-xml")
+            return
+        }
+
+        os_log(.info, log: XMPPConnection.osLog, "%s: Received StartTLS proceed", self.domain)
+
         self.streamEnableTLS()
 
         os_log(.info, log: XMPPConnection.osLog, "%s: Enabled TLS", self.domain)
 
         self.resetParser()
-        self.session = XMPPSession()
+        self.resetSession()
         self.session!.secure = true
         self.sendStreamOpener()
+    }
+
+    internal func processTLSFailure(_ stanza: Stanza) {
+        guard self.session!.requestsMade.startTls else {
+            os_log(.info, log: XMPPConnection.osLog, "%s: Server sent StartTLS failure without being asked", self.domain)
+            self.disconnectAndRetry()
+            return
+        }
+
+        os_log(.info, log: XMPPConnection.osLog, "%s: Received StartTLS failure", self.domain)
+        self.disconnectAndRetry()
     }
 }

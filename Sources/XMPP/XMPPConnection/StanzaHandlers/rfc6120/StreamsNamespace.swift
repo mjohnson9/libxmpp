@@ -12,19 +12,6 @@ import os.log
 extension XMPPConnection {
     // MARK: Handler functions
 
-    internal func processStreamsNamespace(_ stanza: Stanza) {
-        switch stanza.tag {
-        case "features":
-            return self.processFeatures(stanza)
-        case "error":
-            return self.receivedStreamError(stanza)
-        default:
-            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.namespace)
-            self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
-            return
-        }
-    }
-
     internal func receivedStreamStart(_ element: Element) {
         if let defaultNamespace = element.defaultNamespace {
             guard defaultNamespace == "jabber:client" else {
