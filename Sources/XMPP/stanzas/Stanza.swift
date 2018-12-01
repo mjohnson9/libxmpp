@@ -27,7 +27,7 @@ class Stanza {
 
     // MARK: For internal use
     /// The element given for creating the stanza
-    private let element: Element
+    public let element: Element
 
     // MARK: Initializers
     init?(_ element: Element) {

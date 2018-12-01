@@ -29,6 +29,7 @@
 		4C1D349D21B2EC70009D9BB4 /* XMPPClientDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D349C21B2EC70009D9BB4 /* XMPPClientDelegate.swift */; };
 		4C1D34A521B2F9C6009D9BB4 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1D34A421B2F9C6009D9BB4 /* libresolv.tbd */; };
 		4C1D34A721B2F9CB009D9BB4 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1D34A621B2F9CB009D9BB4 /* libxml2.tbd */; };
+		4C1D34B721B302C8009D9BB4 /* FeatureStanza.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D34B621B302C8009D9BB4 /* FeatureStanza.swift */; };
 		4C3ED56521B2DE93007CB7AD /* libxmpp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C3ED55B21B2DE93007CB7AD /* libxmpp.framework */; };
 		4C3ED56A21B2DE93007CB7AD /* libxmppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3ED56921B2DE93007CB7AD /* libxmppTests.swift */; };
 		4C3ED56C21B2DE93007CB7AD /* libxmpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C3ED55E21B2DE93007CB7AD /* libxmpp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -68,6 +69,7 @@
 		4C1D34A221B2F6CA009D9BB4 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		4C1D34A421B2F9C6009D9BB4 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		4C1D34A621B2F9CB009D9BB4 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		4C1D34B621B302C8009D9BB4 /* FeatureStanza.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureStanza.swift; sourceTree = "<group>"; };
 		4C3ED55B21B2DE93007CB7AD /* libxmpp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libxmpp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3ED55E21B2DE93007CB7AD /* libxmpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libxmpp.h; sourceTree = "<group>"; };
 		4C3ED55F21B2DE93007CB7AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -118,7 +120,6 @@
 			isa = PBXGroup;
 			children = (
 				4C1D347C21B2EAE6009D9BB4 /* XMPPErrors.swift */,
-				4C1D347D21B2EAE6009D9BB4 /* XMPPSession.swift */,
 				4C1D347E21B2EAE6009D9BB4 /* stanzas */,
 				4C1D348121B2EAE6009D9BB4 /* XMPPConnection */,
 				4C1D349A21B2EBF4009D9BB4 /* XMPPClient.swift */,
@@ -132,6 +133,7 @@
 			children = (
 				4C1D347F21B2EAE6009D9BB4 /* Stanza.swift */,
 				4C1D348021B2EAE6009D9BB4 /* TLSStanza.swift */,
+				4C1D34B621B302C8009D9BB4 /* FeatureStanza.swift */,
 			);
 			path = stanzas;
 			sourceTree = "<group>";
@@ -139,6 +141,7 @@
 		4C1D348121B2EAE6009D9BB4 /* XMPPConnection */ = {
 			isa = PBXGroup;
 			children = (
+				4C1D347D21B2EAE6009D9BB4 /* XMPPSession.swift */,
 				4C1D348221B2EAE6009D9BB4 /* XMPPConnection.swift */,
 				4C1D348321B2EAE6009D9BB4 /* Stream.swift */,
 				4C1D348421B2EAE6009D9BB4 /* Resolving.swift */,
@@ -361,6 +364,7 @@
 				4C1D349521B2EAE6009D9BB4 /* StanzaHandling.swift in Sources */,
 				4C1D347921B2EADE009D9BB4 /* EventedXMLParser.swift in Sources */,
 				4C1D349D21B2EC70009D9BB4 /* XMPPClientDelegate.swift in Sources */,
+				4C1D34B721B302C8009D9BB4 /* FeatureStanza.swift in Sources */,
 				4C1D348D21B2EAE6009D9BB4 /* XMPPErrors.swift in Sources */,
 				4C1D347421B2EAD7009D9BB4 /* SRVRecord.swift in Sources */,
 				4C1D349921B2EAE6009D9BB4 /* FeatureNegotiation.swift in Sources */,

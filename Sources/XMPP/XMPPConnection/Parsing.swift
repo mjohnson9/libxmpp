@@ -118,7 +118,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
             }
 
             self.session!.openingStreamQualifiedName = qualifiedName
-            receivedStreamStart(stanza: element)
+            receivedStreamStart(element)
             return
         }
 
@@ -146,7 +146,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
         }
 
         if self.session!.currentElement.parent == nil {
-            self.receivedStanza(stanza: self.session.currentElement)
+            self.receivedStanza(element: self.session.currentElement)
             if self.session != nil {
                 // Sometimes, stanza handlers clear the session
                 self.session.currentElement = nil

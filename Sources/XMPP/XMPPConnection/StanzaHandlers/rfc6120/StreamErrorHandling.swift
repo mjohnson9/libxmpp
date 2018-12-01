@@ -10,11 +10,11 @@ import Foundation
 import os.log
 
 extension XMPPConnection {
-    internal func receivedStreamError(stanza: Element) {
+    internal func receivedStreamError(_ stanza: Stanza) {
         var errorTag: String = ""
         var errorContents: String?
         var textContent: [String: String] = [:]
-        for child in stanza.children where child.resolvedNamespace == "urn:ietf:params:xml:ns:xmpp-streams" {
+        for child in stanza.element.children where child.resolvedNamespace == "urn:ietf:params:xml:ns:xmpp-streams" {
             if child.tag == "text" {
                 var lang = ""
                 let langAttribute = child.attributes["xml:lang"]
@@ -33,7 +33,7 @@ extension XMPPConnection {
         let attemptedConnectionAddress = self.connectionAddresses![self.currentConnectionAddress]
         os_log(.info, log: XMPPConnection.osLog, "%s: Received %{public}s error from %s:%d", self.domain, attemptedConnectionAddress.host, attemptedConnectionAddress.port)
 
-        switch(errorTag) {
+        switch errorTag {
         case "see-other-host":
             self.receivedSeeOtherHost(stanza: stanza, errorContents: errorContents)
             return
@@ -45,7 +45,7 @@ extension XMPPConnection {
     }
 
     // MARK: Private error handlers
-    private func receivedSeeOtherHost(stanza: Element, errorContents: String?) {
+    private func receivedSeeOtherHost(stanza: Stanza, errorContents: String?) {
         guard errorContents != nil else {
             os_log(.info, log: XMPPConnection.osLog, "%s: Received see-other-host error with no host specified", self.domain)
             self.disconnectAndRetry()
@@ -68,11 +68,11 @@ extension XMPPConnection {
 
         var alreadyExists: Bool = false // If we've already tried this referral, don't try again
         for address in self.connectionAddresses {
-            if(address.host == host && address.port == port) {
+            if address.host == host && address.port == port {
                 alreadyExists = true
             }
         }
-        if(!alreadyExists) {
+        if !alreadyExists {
             self.connectionAddresses.insert((host: host, port: port), at: self.currentConnectionAddress) // Make the next connection attempt use the given host
         }
 

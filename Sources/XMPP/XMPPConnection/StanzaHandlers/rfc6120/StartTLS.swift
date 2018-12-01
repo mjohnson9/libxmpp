@@ -10,7 +10,7 @@ import Foundation
 import os.log
 
 extension XMPPConnection {
-    internal func processTlsNamespace(stanza: Element) {
+    internal func processTlsNamespace(_ stanza: Stanza) {
         switch stanza.tag {
         case "proceed":
             if !self.session!.requestsMade.startTls {
@@ -31,13 +31,13 @@ extension XMPPConnection {
             self.disconnectAndRetry()
             return
         default:
-            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.resolvedNamespace)
+            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.namespace)
             self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
             return
         }
     }
 
-    internal func negotiateTLS() {
+    internal func negotiateTLS(_ stanza: Stanza) {
         let element = Element()
         element.tag = "starttls"
         element.defaultNamespace = "urn:ietf:params:xml:ns:xmpp-tls"

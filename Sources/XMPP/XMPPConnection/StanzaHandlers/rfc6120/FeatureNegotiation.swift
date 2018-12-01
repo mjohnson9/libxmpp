@@ -9,78 +9,100 @@
 import Foundation
 import os.log
 
+private class PreferredFeature {
+    public let namespace: String
+    public let tag: String
+    public let handler: (XMPPConnection) -> (FeatureStanza) -> Void
+
+    public init(namespace: String, tag: String, handler: @escaping (XMPPConnection) -> (FeatureStanza) -> Void) {
+        self.namespace = namespace
+        self.tag = tag
+        self.handler = handler
+    }
+
+    public func doesMatch(_ feature: PreferredFeature) -> Bool {
+        if self.namespace != "*" && self.namespace != feature.namespace {
+            return false
+        }
+
+        if self.tag != "*" && self.tag != feature.tag {
+            return false
+        }
+
+        return true
+    }
+
+    public func doesMatch(_ feature: FeatureStanza) -> Bool {
+        if self.namespace != "*" && self.namespace != feature.namespace {
+            return false
+        }
+
+        if self.tag != "*" && self.tag != feature.tag {
+            return false
+        }
+
+        return true
+    }
+}
+
 extension XMPPConnection {
-    internal func processFeatures(stanza: Element) {
-        for child in stanza.children {
-            let feature = self.createFeature(child)
-            self.session.features.append(feature)
+    private static let preferredFeatures: [PreferredFeature] = [
+        PreferredFeature(namespace: "urn:ietf:params:xml:ns:xmpp-tls", tag: "starttls", handler: XMPPConnection.negotiateTLS)
+    ]
+    internal func processFeatures(_ stanza: Stanza) {
+        for child in stanza.element.children {
+            guard let feature = FeatureStanza(child) else {
+                os_log(.info, log: XMPPConnection.osLog, "%s: Received feature stanza that couldn't be parsed: %{public}s", child.serialize())
+                self.sendStreamErrorAndClose(tag: "invalid-xml")
+                return
+            }
+
+            self.session.availableFeatures.append(feature)
+
+            if feature.required {
+                self.session.requiredFeaturesRemaining[feature.featureKey()] = feature
+            } else {
+                self.session.optionalFeaturesRemaining[feature.featureKey()] = feature
+            }
         }
 
         self.negotiateNextFeature()
     }
 
-    internal func negotiateNextFeature() {
-        var anyRequired: Bool = false
-        var nextNegotiable: Element!
-        var negotiablePriority: Int = 0
-
-        for feature in self.session.features {
-            switch(feature.namespace) {
-            case "urn:ietf:params:xml:ns:xmpp-tls":
-                if(feature.name == "starttls") {
-                    if(!self.session.secure) {
-                        if(nextNegotiable == nil || (feature.required && negotiablePriority < 1000) || (!feature.required && !anyRequired && negotiablePriority < 1000)) {
-                            nextNegotiable = feature.stanza
-                            anyRequired = feature.required
-                            negotiablePriority = 1000
-                        }
-                    } else {
-                        os_log(.info, log: XMPPConnection.osLog, "%s: Received TLS offer inside of a secure session", self.domain)
-                    }
+    private func negotiateNextFeature() {
+        for (_, requiredFeature) in self.session.requiredFeaturesRemaining {
+            for negotiableFeature in XMPPConnection.preferredFeatures where negotiableFeature.doesMatch(requiredFeature) {
+                if negotiableFeature.doesMatch(requiredFeature) {
+                    return negotiableFeature.handler(self)(requiredFeature)
                 }
-                break
-            default:
-                if(!anyRequired && feature.required) {
-                    anyRequired = true
-                }
-                break
             }
         }
 
-        if(anyRequired && nextNegotiable == nil) {
+        if self.session.requiredFeaturesRemaining.count > 0 {
             os_log(.info, log: XMPPConnection.osLog, "%s: We don't support any of the required features. Disconnecting.", self.domain)
             self.sendStreamErrorAndClose(tag: "unsupported-feature")
             return self.fatalConnectionError(XMPPIncompatibleError())
         }
 
-        if(nextNegotiable != nil) {
-            if(nextNegotiable.resolvedNamespace == "urn:ietf:params:xml:ns:xmpp-tls" && nextNegotiable.tag == "starttls") {
-                return self.negotiateTLS()
-            } else {
-                os_log(.error, log: XMPPConnection.osLog, "%s: Chose feature for negotiation that we don't support: %{public}s -> %{public}s", self.domain, nextNegotiable.resolvedNamespace, nextNegotiable.tag)
-                fatalError()
+        for (_, optionalFeature) in self.session.optionalFeaturesRemaining {
+            for negotiableFeature in XMPPConnection.preferredFeatures where negotiableFeature.doesMatch(optionalFeature) {
+                return negotiableFeature.handler(self)(optionalFeature)
             }
-        } else {
-            os_log(.info, log: XMPPConnection.osLog, "%s: Negotiation finished.", self.domain)
-            self.resetConnectionAttempts() // Finishing negotiation represents a successful connection
-
-            #warning("Currently disconnecting after feature negotiation -- remove this later")
-            self.dispatchConnected(status: XMPPConnectionStatus(serviceAvailable: true, secure: self.session!.secure, canLogin: false, canRegister: false))
-            self.disconnectGracefully()
         }
+
+        os_log(.info, log: XMPPConnection.osLog, "%s: Negotiation finished.", self.domain)
+        self.resetConnectionAttempts() // Finishing negotiation represents a successful connection
+
+        #warning("Currently disconnecting after feature negotiation -- remove this later")
+        self.dispatchConnected(status: XMPPConnectionStatus(serviceAvailable: true, secure: self.session!.secure, canLogin: false, canRegister: false))
+        self.disconnectGracefully()
     }
 
-    // MARK: Helper functions
+    internal func featureNegotiationComplete(_ feature: FeatureStanza) {
+        let key = feature.featureKey()
+        self.session.requiredFeaturesRemaining.removeValue(forKey: key)
+        self.session.optionalFeaturesRemaining.removeValue(forKey: key)
 
-    private func createFeature(_ stanza: Element) -> XMPPSession.Feature {
-        var feature = XMPPSession.Feature(namespace: stanza.resolvedNamespace, name: stanza.tag, required: false, stanza: stanza)
-
-        for child in stanza.children {
-            if(child.tag == "required") {
-                feature.required = true
-            }
-        }
-
-        return feature
+        self.negotiateNextFeature()
     }
 }

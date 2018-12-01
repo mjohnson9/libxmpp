@@ -12,29 +12,29 @@ import os.log
 extension XMPPConnection {
     // MARK: Handler functions
 
-    internal func processStreamsNamespace(stanza: Element) {
+    internal func processStreamsNamespace(_ stanza: Stanza) {
         switch stanza.tag {
         case "features":
-            return self.processFeatures(stanza: stanza)
+            return self.processFeatures(stanza)
         case "error":
-            return self.receivedStreamError(stanza: stanza)
+            return self.receivedStreamError(stanza)
         default:
-            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.resolvedNamespace)
+            os_log(.info, log: XMPPConnection.osLog, "%s: Unable to handle stanza with tag %{public}s in namespace %{public}s", self.domain, stanza.tag, stanza.namespace)
             self.sendStreamErrorAndClose(tag: "unsupported-stanza-type")
             return
         }
     }
 
-    internal func receivedStreamStart(stanza: Element) {
-        if let defaultNamespace = stanza.defaultNamespace {
+    internal func receivedStreamStart(_ element: Element) {
+        if let defaultNamespace = element.defaultNamespace {
             guard defaultNamespace == "jabber:client" else {
-                os_log(.info, log: XMPPConnection.osLog, "%s: Received invalid content namespace: %{public}s", self.domain, stanza.defaultNamespace)
+                os_log(.info, log: XMPPConnection.osLog, "%s: Received invalid content namespace: %{public}s", self.domain, element.defaultNamespace)
                 self.sendStreamErrorAndClose(tag: "invalid-namespace")
                 return
             }
         }
 
-        guard let versionAttribute = stanza.attributes["version"] else {
+        guard let versionAttribute = element.attributes["version"] else {
             // Version is a required attribute
             os_log(.info, log: XMPPConnection.osLog, "%s: Stream start is missing version attribute", self.domain)
             self.sendStreamErrorAndClose(tag: "invalid-xml")
