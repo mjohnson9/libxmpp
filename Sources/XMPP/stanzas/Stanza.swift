@@ -14,16 +14,14 @@ class Stanza {
     public let tag: String
     /// The resolved XML namespace of this stanza
     public let namespace: String
-    // swiftlint:disable identifier_name
     /// The message ID sent with this stanza
     public let id: String
-    // swiftlint:enable identifier_name
+    // swiftlint:disable:previous identifier_name
     /// The address that this stanza came from
     public let from: String
-    // swiftlint:disable identifier_name
     /// The address that this stanza was sent to
     public let to: String
-    // swiftlint:enable identifier_name
+    // swiftlint:disable:previous identifier_name
 
     // MARK: For internal use
     /// The element given for creating the stanza
@@ -48,13 +46,12 @@ class Stanza {
             self.from = ""
         }
 
-        // swiftlint:disable identifier_name
+        // swiftlint:disable:next identifier_name
         if let to = element.attributes["to"] {
             self.to = to
         } else {
             self.to = ""
         }
-        // swiftlint:enable identifier_name
     }
 
     public func mapKey() -> String {

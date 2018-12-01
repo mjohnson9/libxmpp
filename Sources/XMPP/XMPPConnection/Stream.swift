@@ -260,9 +260,8 @@ extension XMPPConnection: StreamDelegate {
         self.write(string: element.serialize())
     }
 
-    // swiftlint:disable identifier_name
+    // swiftlint:disable:next identifier_name
     internal func writeStreamBegin(xmppVersion: String, to: String, from: String?) {
-        // swiftlint:enable identifier_name
         let openStream: NSMutableString = "<?xml version='1.0' encoding='UTF-8'?><stream:stream"
         if from != nil {
             openStream.append(" from='\(Element.escapeAttribute(from!))'")
