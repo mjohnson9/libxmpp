@@ -131,8 +131,6 @@ internal class Resolver {
         let rDataBytes = rDataPointer.assumingMemoryBound(to: UInt8.self)
         rrData.append(rDataBytes, count: Int(rDataLen))
 
-        print(rrData.map { String(format: "%02hhx", $0) }.joined())
-
         let resourceRecordPointerOptional = rrData.withUnsafeBytes { (rrBytes: UnsafePointer<Int8>) in
             return dns_parse_resource_record(rrBytes, UInt32(rrData.count))
         }
