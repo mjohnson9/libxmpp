@@ -17,6 +17,8 @@ internal class Resolver {
     private let name: String
     private let queryType: UInt16
 
+    private var continueProcessing: Bool = true
+
     private var error: Error! = nil
     public var results: [DNSRecord] = []
 
@@ -73,27 +75,36 @@ internal class Resolver {
             fatalError()
         }
 
-        DNSServiceProcessResult(dnsServiceRef.pointee)
+        while self.continueProcessing {
+            let error = DNSServiceProcessResult(dnsServiceRef.pointee)
+            guard error == kDNSServiceErr_NoError else {
+                return DNSServiceError(error)
+            }
+        }
 
         return self.error
     }
 
     // swiftlint:disable:next function_parameter_count
     internal func queryRecordCallback(dnsServiceRef: DNSServiceRef?, flags: DNSServiceFlags, interfaceIndex: UInt32, error: DNSServiceErrorType, fullNameCString: UnsafePointer<Int8>?, rrType: UInt16, rrClass: UInt16, rDataLen: UInt16, rDataPointer: UnsafeRawPointer?, ttl: UInt32) {
+        if (flags & kDNSServiceFlagsMoreComing) != kDNSServiceFlagsMoreComing {
+            self.continueProcessing = false
+        }
         guard error == kDNSServiceErr_NoError else {
             let serviceError = DNSServiceError(error)
             self.error = serviceError
             return
         }
-        guard let fullNameCString = fullNameCString, let rDataPointer = rDataPointer else {
-            fatalError("Not all needed variables are present")
+        guard rrType == self.queryType else {
+            // Probably an intermediate
+            return
         }
-        guard let fullNameData = String(cString: fullNameCString).data(using: .ascii) else {
-            fatalError("Failed to encode full name to ASCII")
+        guard let rDataPointer = rDataPointer else {
+            fatalError("Not all needed variables are present")
         }
 
         var rrData = Data()
-        rrData.reserveCapacity(fullNameData.count + 1 + (MemoryLayout<UInt16>.size * 2) + MemoryLayout<UInt32>.size + MemoryLayout<UInt16>.size + Int(rDataLen))
+        rrData.reserveCapacity(1 + (MemoryLayout<UInt16>.size * 2) + MemoryLayout<UInt32>.size + MemoryLayout<UInt16>.size + Int(rDataLen))
 
         // Write full name of RR
         var fullNameLength = UInt8(0)
