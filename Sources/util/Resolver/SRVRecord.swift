@@ -11,12 +11,16 @@ import os.log
 import dnssd
 import dnsutil
 
-class SRVRecord: DNSRecord {
+class SRVRecord: DNSRecord, CustomStringConvertible {
     var target: String
     var port: UInt16
     var priority: UInt16
     var weight: UInt16
     internal var weightForShuffle: Float
+
+    public var description: String {
+        return "IN SRV " + String(self.priority) + " " + String(self.weight) + " " + String(self.port) + " " + String(self.target)
+    }
 
     init(record: dns_resource_record_t) {
         guard record.dnstype == kDNSServiceType_SRV else {
@@ -26,7 +30,7 @@ class SRVRecord: DNSRecord {
             fatalError("Failed to get SRV data from resource record")
         }
         let data = dataPointer.pointee
-        
+
         self.target = String(cString: data.target)
         self.port = data.port
         self.priority = data.priority
