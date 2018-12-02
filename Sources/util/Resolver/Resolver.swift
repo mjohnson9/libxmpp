@@ -149,7 +149,6 @@ internal class Resolver {
             self.results.append(SRVRecord(record: record))
         default:
             os_log(.error, log: Resolver.osLog, "Unable to handle resource record of type %d", record.dnstype)
-            fatalError()
         }
     }
 }
