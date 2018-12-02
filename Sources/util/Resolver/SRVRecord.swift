@@ -8,25 +8,29 @@
 
 import Foundation
 import os.log
+import dnssd
+import dnsutil
 
-import SRVResolver
-
-class SRVRecord: NSObject {
+class SRVRecord: DNSRecord {
     var target: String
     var port: UInt16
     var priority: UInt16
     var weight: UInt16
     internal var weightForShuffle: Float
 
-    init(dict: NSDictionary) {
-        guard let target = dict[kSRVResolverTarget] as? String, let port = dict[kSRVResolverPort] as? Int64, let priority = dict[kSRVResolverPriority] as? Int64, let weight = dict[kSRVResolverWeight] as? Int64 else {
-            os_log(.error, "Received invalid SRV record dictionary: %@", dict)
-            fatalError()
+    init(record: dns_resource_record_t) {
+        guard record.dnstype == kDNSServiceType_SRV else {
+            fatalError("SRVRecord constructor given a non-SRV record")
         }
-        self.target = target
-        self.port = UInt16(port)
-        self.priority = UInt16(priority)
-        self.weight = UInt16(weight)
+        guard let dataPointer = record.data.SRV else {
+            fatalError("Failed to get SRV data from resource record")
+        }
+        let data = dataPointer.pointee
+        
+        self.target = String(cString: data.target)
+        self.port = data.port
+        self.priority = data.priority
+        self.weight = data.weight
 
         let weightNormalized: Float = (self.weight == 0 ? 0.1 : Float(self.weight))
         self.weightForShuffle = Float.random(in: 0..<1) * (1.0 / weightNormalized)

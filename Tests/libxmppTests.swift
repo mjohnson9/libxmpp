@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import libxmpp
+import dnssd
 
 class BaseTests: XCTestCase {
 
@@ -22,6 +23,11 @@ class BaseTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+
+    func testSRVResolverDeallocate() {
+        let resolver = Resolver(srvName: "_xmpp-client._tcp.gmail.com")
+        resolver.resolve()
     }
 
     func testPerformanceExample() {

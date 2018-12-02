@@ -6,7 +6,7 @@
 //  Copyright © 2018 Michael Johnson. All rights reserved.
 //
 
-import Foundation
+/*import Foundation
 import libxml2
 
 class EventedXMLParser {
@@ -69,4 +69,4 @@ class XMLParsingError: Error {
     @objc optional func foundProcessingInstruction(target: String, data: String?)
     @objc optional func foundComment(comment: String)
     @objc optional func foundCDATA(data: Data)
-}
+}*/

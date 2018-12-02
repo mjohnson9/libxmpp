@@ -51,7 +51,7 @@
  
  */
 
-#ifndef SRVResolver_h
+/*#ifndef SRVResolver_h
 #define SRVResolver_h
 
 #import <Foundation/Foundation.h>

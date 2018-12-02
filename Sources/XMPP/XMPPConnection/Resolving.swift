@@ -9,54 +9,23 @@
 import Foundation
 import os.log
 
-import SRVResolver
-
 private struct AssociatedKeys {
-    static var resolver: UInt8 = 0
-    static var resolverTimer: UInt8 = 0
+    // static var resolver: UInt8 = 0
 }
 
-extension XMPPConnection: SRVResolverDelegate {
+extension XMPPConnection {
     // MARK: Variables
 
     private var srvName: String {
         return "_xmpp-client._tcp." + self.domain
     }
 
-    private var resolver: SRVResolver! {
-        get {
-            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.resolver) as? SRVResolver else {
-                return nil
-            }
-            return value
-        }
-        set(newValue) {
-            objc_setAssociatedObject(self, &AssociatedKeys.resolver, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-
-    private var resolverTimer: Timer! {
-        get {
-            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.resolverTimer) as? Timer else {
-                return nil
-            }
-            return value
-        }
-        set(newValue) {
-            objc_setAssociatedObject(self, &AssociatedKeys.resolverTimer, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-
     // MARK: Functions exposed to other modules
 
     internal func resolveSRV() {
         os_log(.debug, log: XMPPConnection.osLog, "%s: Resolving SRV records", self.domain)
-        self.resolver = SRVResolver(srvName: self.srvName)
-        self.resolver.delegate = self
-        self.resolver.start()
 
-        self.resolverTimer = Timer(timeInterval: 1.0, target: self, selector: #selector(self.resolverTimeout), userInfo: nil, repeats: false)
-        RunLoop.current.add(self.resolverTimer, forMode: RunLoop.Mode.common)
+        let resolver = Resolver(srvName: self.srvName)
     }
 
     // MARK: Handle DNS results
@@ -94,27 +63,23 @@ extension XMPPConnection: SRVResolverDelegate {
 
     // MARK: SRVResolverDelegate functions
 
-    public func srvResolver(_ resolver: SRVResolver!, didStopWithError error: Error!) {
+    /*public func srvResolver(_ resolver: SRVResolver!, didStopWithError error: Error!) {
         self.resolverTimer.invalidate()
         self.resolverTimer = nil
 
         if error != nil {
-            if let errorCasted = error as NSError? {
-                os_log(.info, log: XMPPConnection.osLog, "%s: Failed to resolve SRV records: %@", self.domain, errorCasted)
-            } else {
-                os_log(.info, log: XMPPConnection.osLog, "%s: Failed to resolve SRV records: (unknown error type)", self.domain)
-            }
+            os_log(.info, log: XMPPConnection.osLog, "%s: Failed to resolve SRV records: %s", self.domain, String(describing: error))
             self.switchToFallbackDNS()
             return
         }
 
         os_log(.debug, log: XMPPConnection.osLog, "%s: Received SRV records: %@", self.domain, self.resolver.results)
         self.handleSRVResults(results: self.convertSRVRecords(results: self.resolver.results))
-    }
+    }*/
 
     // MARK: Timeout functions
 
-    @objc private func resolverTimeout(timer: Timer) {
+    /*@objc private func resolverTimeout(timer: Timer) {
         if self.resolver.isFinished {
             return
         }
@@ -123,11 +88,11 @@ extension XMPPConnection: SRVResolverDelegate {
 
         self.resolver.stop()
         self.handleSRVResults(results: self.convertSRVRecords(results: self.resolver.results))
-    }
+    }*/
 
     // MARK: Helper functions
 
-    private func convertSRVRecords(results: [Any]!) -> [SRVRecord]? {
+    /*private func convertSRVRecords(results: [Any]!) -> [SRVRecord]? {
         if results == nil || results.count == 0 {
             return nil
         }
@@ -147,5 +112,5 @@ extension XMPPConnection: SRVResolverDelegate {
         SRVRecord.shuffle(records: &converted)
 
         return converted
-    }
+    }*/
 }

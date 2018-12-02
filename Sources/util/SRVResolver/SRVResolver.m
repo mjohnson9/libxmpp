@@ -51,7 +51,7 @@
  
  */
 
-#import "SRVResolver.h"
+/*#import "SRVResolver.h"
 
 #include <dns_util.h>
 
@@ -379,4 +379,4 @@ NSString * kSRVResolverWeight   = @"weight";
 NSString * kSRVResolverPort     = @"port";
 NSString * kSRVResolverTarget   = @"target";
 
-NSString * kSRVResolverErrorDomain = @"kSRVResolverErrorDomain";
+NSString * kSRVResolverErrorDomain = @"kSRVResolverErrorDomain";*/
