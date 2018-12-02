@@ -26,6 +26,25 @@ extension XMPPConnection {
         os_log(.debug, log: XMPPConnection.osLog, "%s: Resolving SRV records", self.domain)
 
         let resolver = Resolver(srvName: self.srvName)
+        let error = resolver.resolve()
+        guard error == nil else {
+            os_log(.info, log: XMPPConnection.osLog, "%s: Got an error resolving SRV record: %s", String(describing: error))
+            self.switchToFallbackDNS()
+            return
+        }
+
+        var resultsCasted: [SRVRecord] = []
+        for result in resolver.results {
+            guard let resultCasted = result as? SRVRecord else {
+                os_log(.error, log: XMPPConnection.osLog, "%s: Received record of type %{public}s, but expecting SRVRecord", self.domain, String(describing: type(of: result)))
+                fatalError()
+            }
+
+            resultsCasted.append(resultCasted)
+        }
+
+        SRVRecord.shuffle(records: &resultsCasted)
+        self.handleSRVResults(results: resultsCasted)
     }
 
     // MARK: Handle DNS results
@@ -37,7 +56,8 @@ extension XMPPConnection {
     }
 
     private func handleSRVResults(results: [SRVRecord]!) {
-        if results == nil || results.count == 0 {
+        guard let results = results, results.count > 0 else {
+            os_log(.info, log: XMPPConnection.osLog, "%s: Received no SRV records", self.domain)
             self.switchToFallbackDNS()
             return
         }
