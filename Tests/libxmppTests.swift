@@ -25,9 +25,24 @@ class BaseTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
-    func testSRVResolverDeallocate() {
-        let resolver = Resolver(srvName: "_xmpp-client._tcp.gmail.com")
-        resolver.resolve()
+    func testSRVResolver() {
+        let resolver = Resolver(srvName: "_xmpp-client._tcp.johnson.computer")
+        let error = resolver.resolve()
+        XCTAssertNil(error)
+        XCTAssertGreaterThan(resolver.results.count, 0)
+        print("Results: " + String(describing: resolver.results))
+    }
+
+    func testSRVResolver2() {
+        let resolver = Resolver(srvName: "_xmpp-server._tcp.johnson.computer")
+        let error = resolver.resolve()
+        XCTAssertNotNil(error)
+        guard let serviceError = error as? DNSServiceError else {
+            XCTFail("error is not a DNSServiceError")
+            return
+        }
+        XCTAssertEqual(Int(serviceError.errorNumber), kDNSServiceErr_NoSuchRecord)
+        XCTAssertEqual(resolver.results.count, 0)
     }
 
     func testPerformanceExample() {
