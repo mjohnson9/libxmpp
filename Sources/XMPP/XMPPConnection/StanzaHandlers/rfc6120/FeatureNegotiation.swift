@@ -49,6 +49,7 @@ extension XMPPConnection {
     private static let preferredFeatures: [PreferredFeature] = [
         PreferredFeature(namespace: "urn:ietf:params:xml:ns:xmpp-tls", tag: "starttls", handler: XMPPConnection.negotiateTLS)
     ]
+
     internal func processFeatures(_ stanza: Stanza) {
         for child in stanza.element.children {
             guard let feature = FeatureStanza(child) else {
@@ -94,9 +95,12 @@ extension XMPPConnection {
         os_log(.info, log: XMPPConnection.osLog, "%s: Negotiation finished.", self.domain)
         self.resetConnectionAttempts() // Finishing negotiation represents a successful connection
 
-        #warning("Currently disconnecting after feature negotiation -- remove this later")
-        self.dispatchConnected(status: XMPPConnectionStatus(serviceAvailable: true, secure: self.session!.secure, canLogin: false, canRegister: false))
-        self.disconnectGracefully()
+        if self.isProbe {
+            self.dispatchConnected(status: XMPPConnectionStatus(serviceAvailable: true, secure: self.session!.secure, canLogin: false, canRegister: false))
+            self.disconnectGracefully()
+        } else {
+            #warning("XMPPConnection can't handle not being a probe")
+        }
     }
 
     internal func featureNegotiationComplete(_ feature: FeatureStanza) {

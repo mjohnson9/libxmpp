@@ -21,13 +21,16 @@ public class XMPPConnection: NSObject {
 
     internal var session: XMPPSession!
 
+    public private(set) var isProbe: Bool
+    
     public weak var connectionDelegate: XMPPConnectionDelegate!
 
     // MARK: Initialization and deinitialization
 
-    public init(forDomain domain: String, allowInsecure: Bool) {
+    public init(forDomain domain: String, allowInsecure: Bool, isProbe: Bool) {
         self.domain = domain
         self.allowInsecure = allowInsecure
+        self.isProbe = isProbe
     }
 
     deinit {
