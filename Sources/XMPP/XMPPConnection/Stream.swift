@@ -17,7 +17,6 @@ private struct AssociatedKeys {
     static var readThread: UInt8 = 0
     static var connectionErrors: UInt8 = 0
     static var gracefulCloseTimer: UInt8 = 0
-    static var parser: UInt8 = 0
 }
 
 extension XMPPConnection: StreamDelegate {
@@ -106,24 +105,13 @@ extension XMPPConnection: StreamDelegate {
         }
     }
 
-    private var parser: XMLParser! {
-        get {
-            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.parser) as? XMLParser else {
-                return nil
-            }
-            return value
-        }
-        set(newValue) {
-            objc_setAssociatedObject(self, &AssociatedKeys.parser, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-
     internal var streamIsOpen: Bool {
         if self.inStream == nil || self.outStream == nil {
             return false
         }
 
-        return true
+        let streamStatus = self.inStream.streamStatus
+        return (streamStatus == .open || streamStatus == .reading || streamStatus == .writing)
     }
 
     // MARK: Connection functions
@@ -150,9 +138,7 @@ extension XMPPConnection: StreamDelegate {
             let error = self.attemptConnection(toHostname: connectionAddress.host, toPort: connectionAddress.port)
 
             // Send some debug information
-            if let nsError = error as NSError? {
-                print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port) with error: (\(nsError.domain):\(nsError.code)) \(nsError.localizedDescription) | \(nsError.localizedFailureReason ?? "(no localized failure reason)")")
-            } else if error != nil {
+            if let error = error {
                 print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port) with error: (\(String(describing: error))")
             } else {
                 print("\(self.domain): Disconnected from \(connectionAddress.host):\(connectionAddress.port)")
@@ -173,15 +159,20 @@ extension XMPPConnection: StreamDelegate {
         self.inStream = inStream
         self.outStream = outStream
 
-        self.inStream.delegate = self
-        self.outStream.delegate = self
+        /*self.inStream.delegate = self
+        self.outStream.delegate = self*/
 
-        self.inStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)
-        self.outStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)
+        /*self.inStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)
+         self.outStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)*/
 
-        self.parser = self.createParser()
-
+        self.inStream.open()
         self.outStream.open()
+        defer {
+            self.outStream.close()
+            self.inStream.close()
+        }
+
+        self.sendStreamOpener()
 
         var parser = self.createParser()
         var success = true
@@ -197,19 +188,17 @@ extension XMPPConnection: StreamDelegate {
             }
         }
 
-        os_log(.info, log: XMPPConnection.osLog, "%s: Lost connection to %{private}s:%{private}d", self.domain, hostname, port)
-
         var errors: [Error] = []
         if let castedError = parser.parserError as NSError? {
-            os_log(.info, log: XMPPConnection.osLog, "%s: Parser error: %@", self.domain, castedError)
+            os_log(.debug, log: XMPPConnection.osLog, "%s: Parser error: %@", self.domain, castedError)
             errors.append(castedError)
         }
         if let inStreamError = self.inStream.streamError as NSError? {
-            os_log(.info, log: XMPPConnection.osLog, "%s: Input stream error: %@", self.domain, inStreamError)
+            os_log(.debug, log: XMPPConnection.osLog, "%s: Input stream error: %@", self.domain, inStreamError)
             errors.append(inStreamError)
         }
         if let outStreamError = self.outStream.streamError as NSError? {
-            os_log(.info, log: XMPPConnection.osLog, "%s: Output stream error: %@", self.domain, outStreamError)
+            os_log(.debug, log: XMPPConnection.osLog, "%s: Output stream error: %@", self.domain, outStreamError)
             errors.append(outStreamError)
         }
 
