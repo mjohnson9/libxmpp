@@ -27,12 +27,17 @@ internal class Resolver {
         self.queryType = UInt16(kDNSServiceType_SRV)
     }
 
-    init(hostname: String) {
-        self.name = hostname
+    init(hostname4: String) {
+        self.name = hostname4
         self.queryType = UInt16(kDNSServiceType_A)
     }
 
-    public func resolve() -> Error {
+    init(hostname6: String) {
+        self.name = hostname6
+        self.queryType = UInt16(kDNSServiceType_AAAA)
+    }
+
+    public func resolve() -> Error! {
         self.error = nil
 
         let dnsServiceRef: UnsafeMutablePointer<DNSServiceRef?> = UnsafeMutablePointer.allocate(capacity: MemoryLayout<DNSServiceRef>.size)
