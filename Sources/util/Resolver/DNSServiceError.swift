@@ -9,19 +9,19 @@
 import Foundation
 import dnssd
 
-class DNSServiceError: Error {
+class DNSServiceError: Error, CustomStringConvertible {
     public var description: String {
-        return self.name + " (" + String(self.underlyingError) + ")"
+        return self.name + " (" + String(self.errorNumber) + ")"
     }
 
     public let name: String
-    public let underlyingError: DNSServiceErrorType
+    public let errorNumber: DNSServiceErrorType
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     init(_ error: DNSServiceErrorType) {
-        self.underlyingError = error
+        self.errorNumber = error
 
-        switch Int(self.underlyingError) {
+        switch Int(self.errorNumber) {
         case kDNSServiceErr_AlreadyRegistered:
             self.name = "kDNSServiceErr_AlreadyRegistered"
         case kDNSServiceErr_BadFlags:
