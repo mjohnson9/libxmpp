@@ -32,9 +32,13 @@
 		4C1D34BD21B34CEB009D9BB4 /* Resolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D34BC21B34CEB009D9BB4 /* Resolver.swift */; };
 		4C1D34C021B35777009D9BB4 /* DNSServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D34BF21B35777009D9BB4 /* DNSServiceError.swift */; };
 		4C1D34C521B36CF1009D9BB4 /* DNSRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D34C421B36CF1009D9BB4 /* DNSRecord.swift */; };
+		4C331EB421B553DF007FB42C /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C331EB321B553DF007FB42C /* libxml2.tbd */; };
 		4C3ED56521B2DE93007CB7AD /* libxmpp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C3ED55B21B2DE93007CB7AD /* libxmpp.framework */; };
 		4C3ED56A21B2DE93007CB7AD /* libxmppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3ED56921B2DE93007CB7AD /* libxmppTests.swift */; };
 		4C3ED56C21B2DE93007CB7AD /* libxmpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C3ED55E21B2DE93007CB7AD /* libxmpp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4CDE3EDA21B7394900EC1609 /* XMPPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3ED921B7394900EC1609 /* XMPPState.swift */; };
+		4CDE3EDC21B73C0B00EC1609 /* StateOpenStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */; };
+		4CDE3EDE21B73F7800EC1609 /* XMPPParserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,12 +78,16 @@
 		4C1D34BF21B35777009D9BB4 /* DNSServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSServiceError.swift; sourceTree = "<group>"; };
 		4C1D34C221B36336009D9BB4 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		4C1D34C421B36CF1009D9BB4 /* DNSRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecord.swift; sourceTree = "<group>"; };
+		4C331EB321B553DF007FB42C /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		4C3ED55B21B2DE93007CB7AD /* libxmpp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libxmpp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3ED55E21B2DE93007CB7AD /* libxmpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libxmpp.h; sourceTree = "<group>"; };
 		4C3ED55F21B2DE93007CB7AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4C3ED56421B2DE93007CB7AD /* libxmppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libxmppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3ED56921B2DE93007CB7AD /* libxmppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = libxmppTests.swift; sourceTree = "<group>"; };
 		4C3ED56B21B2DE93007CB7AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CDE3ED921B7394900EC1609 /* XMPPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPState.swift; sourceTree = "<group>"; };
+		4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateOpenStream.swift; sourceTree = "<group>"; };
+		4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPParserState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C331EB421B553DF007FB42C /* libxml2.tbd in Frameworks */,
 				4C1D34A521B2F9C6009D9BB4 /* libresolv.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -145,13 +154,16 @@
 		4C1D348121B2EAE6009D9BB4 /* XMPPConnection */ = {
 			isa = PBXGroup;
 			children = (
-				4C1D347D21B2EAE6009D9BB4 /* XMPPSession.swift */,
+				4CDE3ED821B7393A00EC1609 /* States */,
 				4C1D348221B2EAE6009D9BB4 /* XMPPConnection.swift */,
 				4C1D348321B2EAE6009D9BB4 /* Stream.swift */,
 				4C1D348421B2EAE6009D9BB4 /* Resolving.swift */,
 				4C1D348521B2EAE6009D9BB4 /* Parsing.swift */,
 				4C1D348621B2EAE6009D9BB4 /* StanzaHandling.swift */,
 				4C1D348721B2EAE6009D9BB4 /* StanzaHandlers */,
+				4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */,
+				4C1D347D21B2EAE6009D9BB4 /* XMPPSession.swift */,
+				4CDE3ED921B7394900EC1609 /* XMPPState.swift */,
 			);
 			path = XMPPConnection;
 			sourceTree = "<group>";
@@ -187,6 +199,7 @@
 		4C1D34A321B2F9C6009D9BB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4C331EB321B553DF007FB42C /* libxml2.tbd */,
 				4C1D34A421B2F9C6009D9BB4 /* libresolv.tbd */,
 			);
 			name = Frameworks;
@@ -250,6 +263,14 @@
 				4C3ED56B21B2DE93007CB7AD /* Info.plist */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		4CDE3ED821B7393A00EC1609 /* States */ = {
+			isa = PBXGroup;
+			children = (
+				4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */,
+			);
+			path = States;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -390,6 +411,7 @@
 				4C1D34B721B302C8009D9BB4 /* FeatureStanza.swift in Sources */,
 				4C1D348D21B2EAE6009D9BB4 /* XMPPErrors.swift in Sources */,
 				4C1D347421B2EAD7009D9BB4 /* SRVRecord.swift in Sources */,
+				4CDE3EDA21B7394900EC1609 /* XMPPState.swift in Sources */,
 				4C1D349921B2EAE6009D9BB4 /* FeatureNegotiation.swift in Sources */,
 				4C1D347A21B2EADE009D9BB4 /* Element.swift in Sources */,
 				4C1D349421B2EAE6009D9BB4 /* Parsing.swift in Sources */,
@@ -401,8 +423,10 @@
 				4C1D349021B2EAE6009D9BB4 /* TLSStanza.swift in Sources */,
 				4C1D349B21B2EBF4009D9BB4 /* XMPPClient.swift in Sources */,
 				4C1D349321B2EAE6009D9BB4 /* Resolving.swift in Sources */,
+				4CDE3EDC21B73C0B00EC1609 /* StateOpenStream.swift in Sources */,
 				4C1D348E21B2EAE6009D9BB4 /* XMPPSession.swift in Sources */,
 				4C1D349221B2EAE6009D9BB4 /* Stream.swift in Sources */,
+				4CDE3EDE21B73F7800EC1609 /* XMPPParserState.swift in Sources */,
 				4C1D34C521B36CF1009D9BB4 /* DNSRecord.swift in Sources */,
 				4C1D349821B2EAE6009D9BB4 /* StreamErrorHandling.swift in Sources */,
 			);

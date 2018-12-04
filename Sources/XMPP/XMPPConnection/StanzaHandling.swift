@@ -21,7 +21,7 @@ extension XMPPConnection {
         "{urn:ietf:params:xml:ns:xmpp-tls}failure": XMPPConnection.processTLSFailure
     ]
     internal func receivedStanza(element: Element) {
-        os_log(.debug, log: XMPPConnection.osLog, "%s <- %{private}s", self.domain, element.serialize())
+        os_log(.debug, log: XMPPConnection.osLog, "%s -> %{private}s", self.domain, element.serialize())
 
         guard let stanza = Stanza(element) else {
             os_log(.info, log: XMPPConnection.osLog, "%s: Unable to parse incoming stanza: %{private}s", element.serialize())

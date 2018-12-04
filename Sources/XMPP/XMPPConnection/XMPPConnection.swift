@@ -19,11 +19,13 @@ public class XMPPConnection: NSObject {
     internal var connectionAddresses: [(host: String, port: UInt16)]!
     internal private(set) var allowInsecure: Bool = false
 
-    internal var session: XMPPSession!
 
     public private(set) var isProbe: Bool
-    
+
     public weak var connectionDelegate: XMPPConnectionDelegate!
+
+	internal var session: XMPPSession!
+	internal var state: XMPPState
 
     // MARK: Initialization and deinitialization
 

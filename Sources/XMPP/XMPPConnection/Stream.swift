@@ -19,7 +19,9 @@ private struct AssociatedKeys {
     static var gracefulCloseTimer: UInt8 = 0
 }
 
-extension XMPPConnection: StreamDelegate {
+internal class ParserNeedsReset: Error { }
+
+extension XMPPConnection: StreamDelegate, XMPPStateController {
     // MARK: Variables
     private var attemptReconnect: Bool {
         get {
@@ -81,9 +83,9 @@ extension XMPPConnection: StreamDelegate {
         }
     }
 
-    private var gracefulCloseTimer: Timer! {
+    private var gracefulCloseTimer: DispatchSourceTimer! {
         get {
-            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.gracefulCloseTimer) as? Timer else {
+            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.gracefulCloseTimer) as? DispatchSourceTimer else {
                 return nil
             }
             return value
@@ -105,13 +107,17 @@ extension XMPPConnection: StreamDelegate {
         }
     }
 
+	public func switchState(state: XMPPState, data: Any?) {
+		self.state
+	}
+
     internal var streamIsOpen: Bool {
         if self.inStream == nil || self.outStream == nil {
             return false
         }
 
         let streamStatus = self.inStream.streamStatus
-        return (streamStatus == .open || streamStatus == .reading || streamStatus == .writing)
+        return (streamStatus == .opening || streamStatus == .open || streamStatus == .reading || streamStatus == .writing)
     }
 
     // MARK: Connection functions
@@ -160,7 +166,7 @@ extension XMPPConnection: StreamDelegate {
         self.outStream = outStream
 
         /*self.inStream.delegate = self
-        self.outStream.delegate = self*/
+         self.outStream.delegate = self*/
 
         /*self.inStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)
          self.outStream.setProperty(kCFBooleanTrue, forKey: kCFStreamPropertySocketExtendedBackgroundIdleMode as Stream.PropertyKey)*/
@@ -168,38 +174,69 @@ extension XMPPConnection: StreamDelegate {
         self.inStream.open()
         self.outStream.open()
         defer {
-            self.outStream.close()
-            self.inStream.close()
+            if let outStream = self.outStream {
+                outStream.close()
+            }
+            if let inStream = self.inStream {
+                inStream.close()
+            }
         }
 
         self.sendStreamOpener()
 
-        var parser = self.createParser()
-        var success = true
+        var parser: EventedXMLParser!
+		var parserError: Error?
 
-        while success {
-            success = parser.parse()
+		let bufferSize = Int(4096 * 32)
+        let streamBuffer = malloc(bufferSize)!.bindMemory(to: UInt8.self, capacity: bufferSize)
+		defer { free(streamBuffer) }
 
-            if self.parserNeedsReset {
+        while self.inStream != nil {
+            if self.parserNeedsReset || parser == nil {
                 parser = self.createParser()
+				#warning("Need to reset XML parser state here")
                 self.parserHasReset()
 
-                success = true
+                os_log(.debug, log: XMPPConnection.osLog, "%s: Reset XML parser", self.domain)
             }
+
+
+            let readLen = inStream.read(streamBuffer, maxLength: bufferSize)
+			if readLen == -1 {
+				// An error has occured
+				break
+			}
+
+			let data = Data(bytesNoCopy: streamBuffer, count: readLen, deallocator: .none)
+
+			if let dataString = String(data: data, encoding: .utf8) {
+				os_log(.debug, log: XMPPConnection.osLog, "%s -> %s", self.domain, dataString)
+			} else {
+				os_log(.debug, log: XMPPConnection.osLog, "%s -> (couldn't be decoded as UTF-8) %s", data.map { String(format: "%02hhx", $0)}.joined())
+			}
+
+			parserError = parser.feed(data)
+			if parserError != nil {
+				break
+			}
         }
 
         var errors: [Error] = []
-        if let castedError = parser.parserError as NSError? {
+        if let castedError = parserError as NSError? {
             os_log(.debug, log: XMPPConnection.osLog, "%s: Parser error: %@", self.domain, castedError)
             errors.append(castedError)
         }
-        if let inStreamError = self.inStream.streamError as NSError? {
-            os_log(.debug, log: XMPPConnection.osLog, "%s: Input stream error: %@", self.domain, inStreamError)
-            errors.append(inStreamError)
+        if let inStream = self.inStream {
+            if let inStreamError = inStream.streamError as NSError? {
+                os_log(.debug, log: XMPPConnection.osLog, "%s: Input stream error: %@", self.domain, inStreamError)
+                errors.append(inStreamError)
+            }
         }
-        if let outStreamError = self.outStream.streamError as NSError? {
-            os_log(.debug, log: XMPPConnection.osLog, "%s: Output stream error: %@", self.domain, outStreamError)
-            errors.append(outStreamError)
+        if let outStream = self.outStream {
+            if let outStreamError = outStream.streamError as NSError? {
+                os_log(.debug, log: XMPPConnection.osLog, "%s: Output stream error: %@", self.domain, outStreamError)
+                errors.append(outStreamError)
+            }
         }
 
         var error: Error! = nil
@@ -286,6 +323,10 @@ extension XMPPConnection: StreamDelegate {
     }
 
     private func write(string: String) {
+        guard self.streamIsOpen else {
+            os_log(.error, log: XMPPConnection.osLog, "%s: Attempted to write while stream was closed", self.domain)
+            return
+        }
         let encodedString: Data = string.data(using: .utf8)!
         _ = encodedString.withUnsafeBytes {
             self.outStream.write($0, maxLength: encodedString.count)
@@ -296,17 +337,24 @@ extension XMPPConnection: StreamDelegate {
     // MARK: Disconnect functions
 
     public func disconnect() {
+		guard self.streamIsOpen else {
+			return
+		}
         self.disconnectGracefully()
     }
 
     internal func disconnectGracefully() {
         self.session!.requestsMade.endStream = true
+        self.attemptReconnect = false
         self.writeStreamEnd()
 
-        self.gracefulCloseTimer = Timer(timeInterval: 1.0, target: self, selector: #selector(self.gracefulCloseTimeout), userInfo: nil, repeats: false)
-        DispatchQueue.global(qos: .background).async {
-            RunLoop.current.add(self.gracefulCloseTimer, forMode: RunLoop.Mode.common)
+        let gracefulCloseTimer = DispatchSource.makeTimerSource()
+        self.gracefulCloseTimer = gracefulCloseTimer
+        gracefulCloseTimer.setEventHandler {
+            self.gracefulCloseTimeout()
         }
+        gracefulCloseTimer.schedule(deadline: .now() + 1)
+        gracefulCloseTimer.resume()
     }
 
     internal func disconnectWithoutRetry() {
@@ -328,38 +376,33 @@ extension XMPPConnection: StreamDelegate {
         }
 
         if self.gracefulCloseTimer != nil {
-            DispatchQueue.global(qos: .background).async {
-                self.gracefulCloseTimer.invalidate()
-                self.gracefulCloseTimer = nil
-
-                print("Invalidated graceful close timer")
-            }
+            self.gracefulCloseTimer.cancel()
+            self.gracefulCloseTimer = nil
         }
     }
 
     // MARK: Graceful close timeout
 
-    @objc private func gracefulCloseTimeout() {
+    private func gracefulCloseTimeout() {
         self.disconnectWithoutRetry()
         print("\(self.domain): Graceful close timed out")
     }
 
     // MARK: Helper functions
 
-    internal func resetSession() {
+	func resetState() {
         self.session = XMPPSession()
+		self.resetParser()
     }
 
-    private func createParser() -> XMLParser {
-        let parser = XMLParser()
+    private func createParser() -> EventedXMLParser {
+        let parserOptional = EventedXMLParser()
+		guard let parser = parserOptional else {
+			os_log(.error, log: XMPPConnection.osLog, "%s: Failed to create XML parser", self.domain)
+			fatalError()
+		}
 
         parser.delegate = self
-
-        parser.externalEntityResolvingPolicy = .never
-
-        parser.shouldProcessNamespaces = true
-        parser.shouldReportNamespacePrefixes = true
-        parser.shouldResolveExternalEntities = false
 
         return parser
     }

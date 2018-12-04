@@ -28,11 +28,11 @@ extension XMPPConnection {
 
         os_log(.info, log: XMPPConnection.osLog, "%s: Received StartTLS proceed", self.domain)
 
+        self.resetParser()
         self.streamEnableTLS()
 
         os_log(.info, log: XMPPConnection.osLog, "%s: Enabled TLS", self.domain)
 
-        self.resetParser()
         self.resetSession()
         self.session!.secure = true
         self.sendStreamOpener()

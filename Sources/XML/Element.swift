@@ -77,7 +77,11 @@ class Element: NSObject {
         if shortClose {
             returnString.append("/>")
         } else {
-            returnString.append("<\(self.tag)/>")
+            returnString.append("<")
+            if self.prefix.count > 0 {
+                returnString.append("\(self.prefix):")
+            }
+            returnString.append(self.tag + "/>")
         }
 
         return returnString as String

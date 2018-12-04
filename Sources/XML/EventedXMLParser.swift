@@ -6,7 +6,7 @@
 //  Copyright © 2018 Michael Johnson. All rights reserved.
 //
 
-/*import Foundation
+import Foundation
 import libxml2
 
 class EventedXMLParser {
@@ -28,10 +28,12 @@ class EventedXMLParser {
         xmlFreeParserCtxt(self.xmlParserContext)
     }
 
-    public func feed(_ data: Data) {
-        data.withUnsafeBytes { (_: UnsafePointer<Int8>) -> Void in
-            //xmlParseChunk(self.xmlParserContext, dataPointer, data.count, 0)
+    public func feed(_ data: Data) -> Error? {
+        let parserError = data.withUnsafeBytes { (dataPointer: UnsafePointer<Int8>) in
+            return xmlParseChunk(self.xmlParserContext, dataPointer, Int32(data.count), 0)
         }
+
+		return nil
     }
 
     // MARK: Helpers
@@ -40,8 +42,38 @@ class EventedXMLParser {
         var saxHandler = xmlSAXHandler()
         saxHandler.initialized = XML_SAX2_MAGIC
 
+		saxHandler.startDocument = { (context) in
+			guard let context = context else {
+				return
+			}
+
+			let parser = EventedXMLParser.fromContext(context)
+			parser.delegate?.parserDidStartDocument()
+		}
+
+		saxHandler.endDocument = { (context) in
+			guard let context = context else {
+				return
+			}
+
+			let parser = EventedXMLParser.fromContext(context)
+			parser.delegate?.parserDidEndDocument()
+		}
+
+		saxHandler.startElementNs = { (context, localName, prefix, URI, numNamespaces, namespacesPointer, numAttributes, numDefaulted, attributesPointer) in
+			guard let context = context else {
+				return
+			}
+
+			let parser = EventedXMLParser.fromContext(context)
+		}
+
         return saxHandler
     }
+
+	private static func fromContext(_ context: UnsafeMutableRawPointer) -> EventedXMLParser {
+		return Unmanaged<EventedXMLParser>.fromOpaque(context).takeUnretainedValue()
+	}
 }
 
 class XMLParsingError: Error {
@@ -52,21 +84,21 @@ class XMLParsingError: Error {
     }
 }
 
-@objc protocol EventedXMLParserDelegate: class {
-    @objc optional func parserDidStartDocument()
-    @objc optional func parserDidEndDocument()
+protocol EventedXMLParserDelegate: class {
+    func parserDidStartDocument()
+    func parserDidEndDocument()
 
-    @objc optional func elementStarted(tag: String, namespaceURI: String?, prefix: String?, namespaces: [String: String], attributes: [String: String])
-    @objc optional func elementEnded(tag: String, namespaceURI: String?, prefix: String?)
+    func elementStarted(tag: String, namespaceURI: String?, prefix: String, namespaces: [String: String], attributes: [String: String])
+    func elementEnded(tag: String, namespaceURI: String?, prefix: String?)
 
-    @objc optional func resolveExternalEntityName(name: String, systemID: String?) -> Data?
+    func resolveExternalEntityName(name: String, systemID: String?) -> Data?
 
-    @objc optional func parseErrorOccured(error: Error)
+    func parseErrorOccured(error: Error)
 
-    @objc optional func foundCharacters(characters: String)
-    @objc optional func foundIgnorableWhitespace(whitespace: String)
+    func foundCharacters(characters: String)
+    func foundIgnorableWhitespace(whitespace: String)
 
-    @objc optional func foundProcessingInstruction(target: String, data: String?)
-    @objc optional func foundComment(comment: String)
-    @objc optional func foundCDATA(data: Data)
-}*/
+    func foundProcessingInstruction(target: String, data: String?)
+    func foundComment(comment: String)
+    func foundCDATA(data: Data)
+}
