@@ -155,7 +155,7 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
     private func attemptConnection(toHostname hostname: String, toPort port: UInt16) -> Error! {
         print("\(self.domain): Attempting connection to \(hostname):\(port)")
 
-        self.resetSession()
+        self.resetState()
 
         var inStream: InputStream!
         var outStream: OutputStream!
@@ -194,12 +194,10 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         while self.inStream != nil {
             if self.parserNeedsReset || parser == nil {
                 parser = self.createParser()
-				#warning("Need to reset XML parser state here")
                 self.parserHasReset()
 
                 os_log(.debug, log: XMPPConnection.osLog, "%s: Reset XML parser", self.domain)
             }
-
 
             let readLen = inStream.read(streamBuffer, maxLength: bufferSize)
 			if readLen == -1 {

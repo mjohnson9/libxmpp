@@ -18,8 +18,6 @@ public class XMPPConnection: NSObject {
     // MARK: Shared variables
     internal var connectionAddresses: [(host: String, port: UInt16)]!
     internal private(set) var allowInsecure: Bool = false
-
-
     public private(set) var isProbe: Bool
 
     public weak var connectionDelegate: XMPPConnectionDelegate!

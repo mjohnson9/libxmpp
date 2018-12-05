@@ -27,5 +27,6 @@ protocol XMPPStateController: class {
 	func resetState()
 
 	func write(_ element: Element)
+	// swiftlint:disable:next identifier_name
 	func writeStreamBegin(xmppVersion: String, to: String, from: String?)
 }

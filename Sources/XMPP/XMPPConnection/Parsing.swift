@@ -48,6 +48,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
 
 	internal func parserHasReset() {
 		self.parserNeedsReset = false
+		self.parserState = XMPPParserState()
 	}
 
 	// MARK: Parser delegate functions
