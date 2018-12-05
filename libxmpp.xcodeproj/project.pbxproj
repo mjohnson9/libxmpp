@@ -36,6 +36,7 @@
 		4CC9CDB321B7DBA300E6D6C6 /* StateFeatureNegotiation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9CDB221B7DBA300E6D6C6 /* StateFeatureNegotiation.swift */; };
 		4CC9CDB521B7DCF700E6D6C6 /* .travis.yml in Resources */ = {isa = PBXBuildFile; fileRef = 4CC9CDB421B7DCF700E6D6C6 /* .travis.yml */; };
 		4CC9CDB721B7E42F00E6D6C6 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 4CC9CDB621B7E42E00E6D6C6 /* .swiftlint.yml */; };
+		4CC9CDB921B7E51B00E6D6C6 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 4CC9CDB821B7E51B00E6D6C6 /* .gitignore */; };
 		4CDE3EDA21B7394900EC1609 /* XMPPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3ED921B7394900EC1609 /* XMPPState.swift */; };
 		4CDE3EDC21B73C0B00EC1609 /* StateOpenStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */; };
 		4CDE3EDE21B73F7800EC1609 /* XMPPParserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */; };
@@ -85,6 +86,7 @@
 		4CC9CDB221B7DBA300E6D6C6 /* StateFeatureNegotiation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateFeatureNegotiation.swift; sourceTree = "<group>"; };
 		4CC9CDB421B7DCF700E6D6C6 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
 		4CC9CDB621B7E42E00E6D6C6 /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .swiftlint.yml; sourceTree = "<group>"; };
+		4CC9CDB821B7E51B00E6D6C6 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		4CDE3ED921B7394900EC1609 /* XMPPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPState.swift; sourceTree = "<group>"; };
 		4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateOpenStream.swift; sourceTree = "<group>"; };
 		4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPParserState.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 		4C3ED55121B2DE93007CB7AD = {
 			isa = PBXGroup;
 			children = (
+				4CC9CDB821B7E51B00E6D6C6 /* .gitignore */,
 				4CC9CDB621B7E42E00E6D6C6 /* .swiftlint.yml */,
 				4CC9CDB421B7DCF700E6D6C6 /* .travis.yml */,
 				4C3ED55D21B2DE93007CB7AD /* Sources */,
@@ -367,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CC9CDB721B7E42F00E6D6C6 /* .swiftlint.yml in Resources */,
+				4CC9CDB921B7E51B00E6D6C6 /* .gitignore in Resources */,
 				4CC9CDB521B7DCF700E6D6C6 /* .travis.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
