@@ -66,6 +66,8 @@ class EventedXMLParser {
 			}
 
 			let parser = EventedXMLParser.fromContext(context)
+
+			
 		}
 
         return saxHandler

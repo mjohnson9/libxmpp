@@ -23,7 +23,7 @@ public class XMPPConnection: NSObject {
     public weak var connectionDelegate: XMPPConnectionDelegate!
 
 	internal var session: XMPPSession!
-	internal var state: XMPPState
+	internal var state: XMPPState! = nil
 
     // MARK: Initialization and deinitialization
 
@@ -31,6 +31,10 @@ public class XMPPConnection: NSObject {
         self.domain = domain
         self.allowInsecure = allowInsecure
         self.isProbe = isProbe
+
+		super.init()
+
+		self.state = StateOpenStream(stateController: self, data: nil)
     }
 
     deinit {
@@ -58,6 +62,10 @@ public class XMPPConnection: NSObject {
         self.disconnectWithoutRetry()
         self.dispatchCannotConnect(error: error)
     }
+
+	internal func sendStreamError(_ tag: String) {
+		self.switchState(state: StateError(stateController: self, data: tag))
+	}
 }
 
 protocol XMPPStanzaObserver {

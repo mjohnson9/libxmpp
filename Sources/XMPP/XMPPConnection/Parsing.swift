@@ -88,7 +88,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
 		var namespaceURIs = self.session!.namespacePrefixes[didEndMappingPrefix]
 		guard namespaceURIs != nil else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Ended namespace \"%{public}s\" without ever starting it", self.domain, didEndMappingPrefix)
-			//self.sendStreamErrorAndClose(tag: "invalid-xml")
+			//self.sendStreamError("invalid-xml")
 			return
 		}
 		namespaceURIs!.remove(at: namespaceURIs!.count - 1)
@@ -105,7 +105,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
 
 		guard let namespaceURIs = self.parserState.namespacePrefixes[prefix], namespaceURIs.count > 0 else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Element has namespace prefix of %{public}s, but the server never defined that prefix", self.domain, prefix)
-			self.sendStreamErrorAndClose(tag: "bad-format")
+			self.sendStreamError("bad-format")
 			return
 		}
 		let resolvedNamespaceURI = namespaceURIs[namespaceURIs.count - 1]
@@ -151,12 +151,16 @@ extension XMPPConnection: EventedXMLParserDelegate {
 			if self.parserState.openingStreamQualifiedName != nil {
 				// The stream opening was sent, but we've already received a stream open
 				os_log(.info, log: XMPPConnection.osLog, "%s: Received a second stream opening", self.domain)
-				self.sendStreamErrorAndClose(tag: "invalid-xml")
+				self.sendStreamError("invalid-xml")
 				return
 			}
 
-			self.parserState.openingStreamQualifiedName = (element.prefix != nil ? element.prefix + ":" : "") + element.tag
-			self.state.receivedStreamStart(element: element)
+			self.parserState.openingStreamQualifiedName = (element.prefix != "" ? element.prefix + ":" : "") + element.tag
+			let handled = self.state.receivedStreamStart(element: element)
+			guard handled else {
+				self.sendStreamError("invalid-xml")
+				return
+			}
 			return
 		}
 
@@ -167,25 +171,34 @@ extension XMPPConnection: EventedXMLParserDelegate {
 		let qualifiedName = (self.parserState.currentElement.prefix != "" ? self.parserState.currentElement.prefix + ":" : "") + self.parserState.currentElement.tag
 		guard tag == self.parserState.currentElement.tag && prefix == self.parserState.currentElement.prefix else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Tag of ending element doesn't match element currently being processed: %{public}s%{public}s != %{public}s", self.domain, (prefix != nil ? prefix! + ":" : ""), tag, qualifiedName)
-			self.sendStreamErrorAndClose(tag: "bad-format")
+			self.sendStreamError("bad-format")
 			return
 		}
 
 		if self.parserState.openingStreamQualifiedName != nil && qualifiedName == self.parserState.openingStreamQualifiedName {
 			guard self.parserState.currentElement == nil else {
 				os_log(.info, log: XMPPConnection.osLog, "%s: Received stream closing inside of another element", self.domain)
-				self.sendStreamErrorAndClose(tag: "bad-format")
+				self.sendStreamError("bad-format")
 				return
 			}
 
 			self.parserState.openingStreamQualifiedName = nil
-			self.state.receivedStreamEnd()
+			let handled = self.state.receivedStreamEnd()
+			guard handled else {
+				self.disconnectAndRetry()
+				return
+			}
 			return
 		}
 
 		if self.parserState.currentElement.parent == nil {
-			self.state.receivedElement(element: self.parserState.currentElement)
+			let stanza = Stanza(self.parserState.currentElement)
+			let handled = self.state.receivedStanza(stanza: stanza!)
 			self.parserState?.currentElement = nil
+			guard handled else {
+				self.sendStreamError("unsupported-stanza-type")
+				return
+			}
 			return
 		}
 
@@ -195,7 +208,7 @@ extension XMPPConnection: EventedXMLParserDelegate {
 	public func foundCharacters(characters: String) {
 		guard let currentElement = self.parserState.currentElement else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Received text node as a child of the root node", self.domain)
-			self.sendStreamErrorAndClose(tag: "bad-format")
+			self.sendStreamError("bad-format")
 			return
 		}
 
@@ -209,13 +222,13 @@ extension XMPPConnection: EventedXMLParserDelegate {
 	public func foundCDATA(data: Data) {
 		guard let currentElement = self.parserState.currentElement else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Received CDATA as a child of the root node", self.domain)
-			self.sendStreamErrorAndClose(tag: "bad-format")
+			self.sendStreamError("bad-format")
 			return
 		}
 
 		guard let decodedCDATA = String(data: data, encoding: .utf8) else {
 			os_log(.info, log: XMPPConnection.osLog, "%s: Received CDATA that could not be decoded as UTF-8")
-			self.sendStreamErrorAndClose(tag: "unsupported-encoding")
+			self.sendStreamError("unsupported-encoding")
 			return
 		}
 
@@ -230,23 +243,23 @@ extension XMPPConnection: EventedXMLParserDelegate {
 
 	public func resolveExternalEntityName(name: String, systemID: String?) -> Data? {
 		os_log(.info, log: XMPPConnection.osLog, "%s: Received XML external entity", self.domain)
-		self.sendStreamErrorAndClose(tag: "restricted-xml")
+		self.sendStreamError("restricted-xml")
 		return nil
 	}
 
 	public func foundProcessingInstruction(target: String, data: String?) {
 		os_log(.info, log: XMPPConnection.osLog, "%s: Received XML processing instruction", self.domain)
-		self.sendStreamErrorAndClose(tag: "restricted-xml")
+		self.sendStreamError("restricted-xml")
 	}
 
 	public func foundComment(comment: String) {
 		os_log(.info, log: XMPPConnection.osLog, "%s: Received XML comment", self.domain)
-		self.sendStreamErrorAndClose(tag: "restricted-xml")
+		self.sendStreamError("restricted-xml")
 	}
 
 	public func parseErrorOccured(error: Error) {
 		os_log(.info, log: XMPPConnection.osLog, "%s: Error parsing XML stream: %s", self.domain, String(describing: error))
-		self.sendStreamErrorAndClose(tag: "bad-format")
+		self.sendStreamError("bad-format")
 	}
 
 	func parserDidStartDocument() { }

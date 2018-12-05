@@ -12,21 +12,25 @@ protocol XMPPState: class {
 	var description: String { get }
 	var parentState: XMPPState? { get set }
 
-	init(stateController: XMPPStateController)
+	init(stateController: XMPPStateController, data: Any?)
 
 	func run()
-	func receivedElement(element: Element)
-	func receivedStreamStart(element: Element)
-	func receivedStreamEnd()
+	func changingState(nextState: XMPPState)
+	func receivedStanza(stanza: Stanza) -> Bool
+	func receivedStreamStart(element: Element) -> Bool
+	func receivedStreamEnd() -> Bool
 }
 
 protocol XMPPStateController: class {
 	var session: XMPPSession! { get }
+	var domain: String { get }
 
-	func switchState(state: XMPPState, data: Any?)
+	func switchState(state: XMPPState)
 	func resetState()
 
 	func write(_ element: Element)
-	// swiftlint:disable:next identifier_name
-	func writeStreamBegin(xmppVersion: String, to: String, from: String?)
+	func write(string: String)
+
+	func disconnectWithoutRetry()
+	func disconnectAndRetry()
 }

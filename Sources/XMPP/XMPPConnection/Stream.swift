@@ -16,7 +16,6 @@ private struct AssociatedKeys {
     static var outStream: UInt8 = 0
     static var readThread: UInt8 = 0
     static var connectionErrors: UInt8 = 0
-    static var gracefulCloseTimer: UInt8 = 0
 }
 
 internal class ParserNeedsReset: Error { }
@@ -83,18 +82,6 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         }
     }
 
-    private var gracefulCloseTimer: DispatchSourceTimer! {
-        get {
-            guard let value = objc_getAssociatedObject(self, &AssociatedKeys.gracefulCloseTimer) as? DispatchSourceTimer else {
-                return nil
-            }
-            return value
-        }
-        set(newValue) {
-            objc_setAssociatedObject(self, &AssociatedKeys.gracefulCloseTimer, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-
     private var connectionErrors: [Error]! {
         get {
             guard let value = objc_getAssociatedObject(self, &AssociatedKeys.connectionErrors) as? [Error] else {
@@ -107,10 +94,6 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         }
     }
 
-	public func switchState(state: XMPPState, data: Any?) {
-		self.state
-	}
-
     internal var streamIsOpen: Bool {
         if self.inStream == nil || self.outStream == nil {
             return false
@@ -119,6 +102,14 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         let streamStatus = self.inStream.streamStatus
         return (streamStatus == .opening || streamStatus == .open || streamStatus == .reading || streamStatus == .writing)
     }
+
+	// MARK: State functions
+
+	internal func switchState(state: XMPPState) {
+		self.state.changingState(nextState: state)
+		self.state = state
+		self.state.run()
+	}
 
     // MARK: Connection functions
 
@@ -182,7 +173,7 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
             }
         }
 
-        self.sendStreamOpener()
+		self.state.run()
 
         var parser: EventedXMLParser!
 		var parserError: Error?
@@ -257,9 +248,6 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         switch eventCode {
         case Stream.Event.openCompleted:
             print("\(self.domain): \(aStream) is open")
-            if aStream == self.outStream {
-                self.sendStreamOpener()
-            }
         case Stream.Event.hasSpaceAvailable:
             #if DEBUG
             print("\(self.domain): \(aStream) has space available")
@@ -294,33 +282,11 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         self.write(string: element.serialize())
     }
 
-    // swiftlint:disable:next identifier_name
-    internal func writeStreamBegin(xmppVersion: String, to: String, from: String?) {
-        let openStream: NSMutableString = "<?xml version='1.0' encoding='UTF-8'?><stream:stream"
-        if from != nil {
-            openStream.append(" from='\(Element.escapeAttribute(from!))'")
-        }
-        openStream.append(" to='\(Element.escapeAttribute(to))'")
-        openStream.append(" version='\(Element.escapeAttribute(xmppVersion))'")
-        openStream.append(" xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>")
-
-        self.write(string: openStream as String)
-
-        print("\(self.domain): Sent stream opening")
-    }
-
-    internal func sendStreamErrorAndClose(tag: String) {
-        let streamError  = self.constructStreamError(tag: tag)
-        self.write(streamError)
-        print("\(self.domain): Sent stream error:", tag)
-        self.disconnectAndRetry()
-    }
-
     internal func writeStreamEnd() {
         self.write(string: "</stream:stream>")
     }
 
-    private func write(string: String) {
+	internal func write(string: String) {
         guard self.streamIsOpen else {
             os_log(.error, log: XMPPConnection.osLog, "%s: Attempted to write while stream was closed", self.domain)
             return
@@ -338,21 +304,7 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
 		guard self.streamIsOpen else {
 			return
 		}
-        self.disconnectGracefully()
-    }
-
-    internal func disconnectGracefully() {
-        self.session!.requestsMade.endStream = true
-        self.attemptReconnect = false
-        self.writeStreamEnd()
-
-        let gracefulCloseTimer = DispatchSource.makeTimerSource()
-        self.gracefulCloseTimer = gracefulCloseTimer
-        gracefulCloseTimer.setEventHandler {
-            self.gracefulCloseTimeout()
-        }
-        gracefulCloseTimer.schedule(deadline: .now() + 1)
-        gracefulCloseTimer.resume()
+        self.switchState(state: StateGracefulClose(stateController: self, data: nil))
     }
 
     internal func disconnectWithoutRetry() {
@@ -371,11 +323,6 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         if self.outStream != nil {
             self.outStream.close()
             self.outStream = nil
-        }
-
-        if self.gracefulCloseTimer != nil {
-            self.gracefulCloseTimer.cancel()
-            self.gracefulCloseTimer = nil
         }
     }
 
@@ -403,20 +350,5 @@ extension XMPPConnection: StreamDelegate, XMPPStateController {
         parser.delegate = self
 
         return parser
-    }
-
-    private func constructStreamError(tag: String) -> Element {
-        let root = Element()
-        root.prefix = "stream"
-        root.tag = "error"
-        root.attributes["to"] = self.domain
-
-        let child = Element()
-        child.tag = tag
-        child.defaultNamespace = "urn:ietf:params:xml:ns:xmpp-streams"
-
-        root.children = [child]
-
-        return root
     }
 }

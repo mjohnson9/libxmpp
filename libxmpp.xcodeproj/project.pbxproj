@@ -20,11 +20,6 @@
 		4C1D349221B2EAE6009D9BB4 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348321B2EAE6009D9BB4 /* Stream.swift */; };
 		4C1D349321B2EAE6009D9BB4 /* Resolving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348421B2EAE6009D9BB4 /* Resolving.swift */; };
 		4C1D349421B2EAE6009D9BB4 /* Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348521B2EAE6009D9BB4 /* Parsing.swift */; };
-		4C1D349521B2EAE6009D9BB4 /* StanzaHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348621B2EAE6009D9BB4 /* StanzaHandling.swift */; };
-		4C1D349621B2EAE6009D9BB4 /* StreamsNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348921B2EAE6009D9BB4 /* StreamsNamespace.swift */; };
-		4C1D349721B2EAE6009D9BB4 /* StartTLS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348A21B2EAE6009D9BB4 /* StartTLS.swift */; };
-		4C1D349821B2EAE6009D9BB4 /* StreamErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348B21B2EAE6009D9BB4 /* StreamErrorHandling.swift */; };
-		4C1D349921B2EAE6009D9BB4 /* FeatureNegotiation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D348C21B2EAE6009D9BB4 /* FeatureNegotiation.swift */; };
 		4C1D349B21B2EBF4009D9BB4 /* XMPPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D349A21B2EBF4009D9BB4 /* XMPPClient.swift */; };
 		4C1D349D21B2EC70009D9BB4 /* XMPPClientDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1D349C21B2EC70009D9BB4 /* XMPPClientDelegate.swift */; };
 		4C1D34A521B2F9C6009D9BB4 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1D34A421B2F9C6009D9BB4 /* libresolv.tbd */; };
@@ -36,6 +31,9 @@
 		4C3ED56521B2DE93007CB7AD /* libxmpp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C3ED55B21B2DE93007CB7AD /* libxmpp.framework */; };
 		4C3ED56A21B2DE93007CB7AD /* libxmppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C3ED56921B2DE93007CB7AD /* libxmppTests.swift */; };
 		4C3ED56C21B2DE93007CB7AD /* libxmpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C3ED55E21B2DE93007CB7AD /* libxmpp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4CC9CDAD21B7CFEE00E6D6C6 /* StateError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9CDAC21B7CFEE00E6D6C6 /* StateError.swift */; };
+		4CC9CDB021B7D31C00E6D6C6 /* StateGracefulClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9CDAF21B7D31C00E6D6C6 /* StateGracefulClose.swift */; };
+		4CC9CDB321B7DBA300E6D6C6 /* StateFeatureNegotiation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC9CDB221B7DBA300E6D6C6 /* StateFeatureNegotiation.swift */; };
 		4CDE3EDA21B7394900EC1609 /* XMPPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3ED921B7394900EC1609 /* XMPPState.swift */; };
 		4CDE3EDC21B73C0B00EC1609 /* StateOpenStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */; };
 		4CDE3EDE21B73F7800EC1609 /* XMPPParserState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */; };
@@ -65,11 +63,6 @@
 		4C1D348321B2EAE6009D9BB4 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		4C1D348421B2EAE6009D9BB4 /* Resolving.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resolving.swift; sourceTree = "<group>"; };
 		4C1D348521B2EAE6009D9BB4 /* Parsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parsing.swift; sourceTree = "<group>"; };
-		4C1D348621B2EAE6009D9BB4 /* StanzaHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StanzaHandling.swift; sourceTree = "<group>"; };
-		4C1D348921B2EAE6009D9BB4 /* StreamsNamespace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamsNamespace.swift; sourceTree = "<group>"; };
-		4C1D348A21B2EAE6009D9BB4 /* StartTLS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartTLS.swift; sourceTree = "<group>"; };
-		4C1D348B21B2EAE6009D9BB4 /* StreamErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamErrorHandling.swift; sourceTree = "<group>"; };
-		4C1D348C21B2EAE6009D9BB4 /* FeatureNegotiation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureNegotiation.swift; sourceTree = "<group>"; };
 		4C1D349A21B2EBF4009D9BB4 /* XMPPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPClient.swift; sourceTree = "<group>"; };
 		4C1D349C21B2EC70009D9BB4 /* XMPPClientDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPClientDelegate.swift; sourceTree = "<group>"; };
 		4C1D34A421B2F9C6009D9BB4 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
@@ -85,6 +78,9 @@
 		4C3ED56421B2DE93007CB7AD /* libxmppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libxmppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C3ED56921B2DE93007CB7AD /* libxmppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = libxmppTests.swift; sourceTree = "<group>"; };
 		4C3ED56B21B2DE93007CB7AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CC9CDAC21B7CFEE00E6D6C6 /* StateError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateError.swift; sourceTree = "<group>"; };
+		4CC9CDAF21B7D31C00E6D6C6 /* StateGracefulClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateGracefulClose.swift; sourceTree = "<group>"; };
+		4CC9CDB221B7DBA300E6D6C6 /* StateFeatureNegotiation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateFeatureNegotiation.swift; sourceTree = "<group>"; };
 		4CDE3ED921B7394900EC1609 /* XMPPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPState.swift; sourceTree = "<group>"; };
 		4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateOpenStream.swift; sourceTree = "<group>"; };
 		4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPParserState.swift; sourceTree = "<group>"; };
@@ -154,37 +150,17 @@
 		4C1D348121B2EAE6009D9BB4 /* XMPPConnection */ = {
 			isa = PBXGroup;
 			children = (
+				4CC9CDAE21B7D2E000E6D6C6 /* GlobalStanzaHandlers */,
 				4CDE3ED821B7393A00EC1609 /* States */,
 				4C1D348221B2EAE6009D9BB4 /* XMPPConnection.swift */,
 				4C1D348321B2EAE6009D9BB4 /* Stream.swift */,
 				4C1D348421B2EAE6009D9BB4 /* Resolving.swift */,
 				4C1D348521B2EAE6009D9BB4 /* Parsing.swift */,
-				4C1D348621B2EAE6009D9BB4 /* StanzaHandling.swift */,
-				4C1D348721B2EAE6009D9BB4 /* StanzaHandlers */,
 				4CDE3EDD21B73F7800EC1609 /* XMPPParserState.swift */,
 				4C1D347D21B2EAE6009D9BB4 /* XMPPSession.swift */,
 				4CDE3ED921B7394900EC1609 /* XMPPState.swift */,
 			);
 			path = XMPPConnection;
-			sourceTree = "<group>";
-		};
-		4C1D348721B2EAE6009D9BB4 /* StanzaHandlers */ = {
-			isa = PBXGroup;
-			children = (
-				4C1D348821B2EAE6009D9BB4 /* rfc6120 */,
-			);
-			path = StanzaHandlers;
-			sourceTree = "<group>";
-		};
-		4C1D348821B2EAE6009D9BB4 /* rfc6120 */ = {
-			isa = PBXGroup;
-			children = (
-				4C1D348921B2EAE6009D9BB4 /* StreamsNamespace.swift */,
-				4C1D348A21B2EAE6009D9BB4 /* StartTLS.swift */,
-				4C1D348B21B2EAE6009D9BB4 /* StreamErrorHandling.swift */,
-				4C1D348C21B2EAE6009D9BB4 /* FeatureNegotiation.swift */,
-			);
-			path = rfc6120;
 			sourceTree = "<group>";
 		};
 		4C1D349F21B2F596009D9BB4 /* SRVResolver */ = {
@@ -265,10 +241,28 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		4CC9CDAB21B7CF9800E6D6C6 /* rfc6120 */ = {
+			isa = PBXGroup;
+			children = (
+				4CC9CDAC21B7CFEE00E6D6C6 /* StateError.swift */,
+				4CC9CDAF21B7D31C00E6D6C6 /* StateGracefulClose.swift */,
+				4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */,
+				4CC9CDB221B7DBA300E6D6C6 /* StateFeatureNegotiation.swift */,
+			);
+			path = rfc6120;
+			sourceTree = "<group>";
+		};
+		4CC9CDAE21B7D2E000E6D6C6 /* GlobalStanzaHandlers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = GlobalStanzaHandlers;
+			sourceTree = "<group>";
+		};
 		4CDE3ED821B7393A00EC1609 /* States */ = {
 			isa = PBXGroup;
 			children = (
-				4CDE3EDB21B73C0B00EC1609 /* StateOpenStream.swift */,
+				4CC9CDAB21B7CF9800E6D6C6 /* rfc6120 */,
 			);
 			path = States;
 			sourceTree = "<group>";
@@ -403,23 +397,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C1D349521B2EAE6009D9BB4 /* StanzaHandling.swift in Sources */,
 				4C1D347921B2EADE009D9BB4 /* EventedXMLParser.swift in Sources */,
 				4C1D349D21B2EC70009D9BB4 /* XMPPClientDelegate.swift in Sources */,
 				4C1D34BD21B34CEB009D9BB4 /* Resolver.swift in Sources */,
 				4C1D34C021B35777009D9BB4 /* DNSServiceError.swift in Sources */,
 				4C1D34B721B302C8009D9BB4 /* FeatureStanza.swift in Sources */,
 				4C1D348D21B2EAE6009D9BB4 /* XMPPErrors.swift in Sources */,
+				4CC9CDB321B7DBA300E6D6C6 /* StateFeatureNegotiation.swift in Sources */,
 				4C1D347421B2EAD7009D9BB4 /* SRVRecord.swift in Sources */,
+				4CC9CDB021B7D31C00E6D6C6 /* StateGracefulClose.swift in Sources */,
 				4CDE3EDA21B7394900EC1609 /* XMPPState.swift in Sources */,
-				4C1D349921B2EAE6009D9BB4 /* FeatureNegotiation.swift in Sources */,
 				4C1D347A21B2EADE009D9BB4 /* Element.swift in Sources */,
 				4C1D349421B2EAE6009D9BB4 /* Parsing.swift in Sources */,
+				4CC9CDAD21B7CFEE00E6D6C6 /* StateError.swift in Sources */,
 				4C1D348F21B2EAE6009D9BB4 /* Stanza.swift in Sources */,
 				4C1D347521B2EAD7009D9BB4 /* SRVResolver.m in Sources */,
 				4C1D349121B2EAE6009D9BB4 /* XMPPConnection.swift in Sources */,
-				4C1D349621B2EAE6009D9BB4 /* StreamsNamespace.swift in Sources */,
-				4C1D349721B2EAE6009D9BB4 /* StartTLS.swift in Sources */,
 				4C1D349021B2EAE6009D9BB4 /* TLSStanza.swift in Sources */,
 				4C1D349B21B2EBF4009D9BB4 /* XMPPClient.swift in Sources */,
 				4C1D349321B2EAE6009D9BB4 /* Resolving.swift in Sources */,
@@ -428,7 +421,6 @@
 				4C1D349221B2EAE6009D9BB4 /* Stream.swift in Sources */,
 				4CDE3EDE21B73F7800EC1609 /* XMPPParserState.swift in Sources */,
 				4C1D34C521B36CF1009D9BB4 /* DNSRecord.swift in Sources */,
-				4C1D349821B2EAE6009D9BB4 /* StreamErrorHandling.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
