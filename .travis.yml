@@ -5,6 +5,5 @@ xcode_scheme: libxmpp
 xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone XS
 
 script:
-  - env
   - swiftlint --strict --quiet
-  - set -o pipefail && xcodebuild -project "$XCODE_PROJECT" -scheme "$XCODE_SCHEME" -destination "$XCODE_DESTINATION" build test | xcpretty
+  - set -o pipefail && xcodebuild -project "$TRAVIS_XCODE_PROJECT" -scheme "$TRAVIS_XCODE_SCHEME" -destination "$TRAVIS_XCODE_DESTINATION" build test | xcpretty
