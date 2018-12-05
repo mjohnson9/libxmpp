@@ -1,0 +1,4 @@
+language: swift
+xcode_project: libxmpp.xcodeproj
+xcode_scheme: libxmppTests
+xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone XS
