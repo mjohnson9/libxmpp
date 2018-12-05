@@ -3,3 +3,5 @@ osx_image: xcode10.1
 xcode_project: libxmpp.xcodeproj
 xcode_scheme: libxmpp
 xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone XS
+
+script: swiftlint
